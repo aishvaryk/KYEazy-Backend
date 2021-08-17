@@ -41,7 +41,6 @@ public class Employee {
     @Column(name="status")
     private String status;
 
-
     @Column(name="date_time_of_verification")
     private Date dateTimeOfVerification;
 
