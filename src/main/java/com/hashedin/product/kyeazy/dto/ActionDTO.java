@@ -10,7 +10,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ActionDTO {
-    private int id;
+    private Integer id;
     private boolean success;
     private String message;
+
 }

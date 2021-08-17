@@ -22,18 +22,25 @@ public class Employee {
     @Column(name="password")
     private String password;
 
-    @Column(name="name")
-    private String name;
+    @Column(name="first_name")
+    private String firstName;
+
+    @Column(name="last_name")
+    private String lastName;
 
     @Column(name="contact_number")
     private String contactNumber;
+
+    @Column(name="email_id")
+    private String emailID;
 
     @Lob
     @Column(name="captured_image")
     private byte[] capturedImage;
 
     @Column(name="status")
-    private boolean status;
+    private String status;
+
 
     @Column(name="date_time_of_verification")
     private Date dateTimeOfVerification;
