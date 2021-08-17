@@ -1,12 +1,16 @@
 package com.hashedin.product.kyeazy.controllers;
 
 import com.hashedin.product.kyeazy.dto.ActionDTO;
-import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
+import com.hashedin.product.kyeazy.exceptions.RequiredFieldException;
+import com.hashedin.product.kyeazy.exceptions.response.ExceptionResponse;
 import com.hashedin.product.kyeazy.services.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/company")
@@ -38,33 +42,22 @@ public class CompanyController {
         return companyService.register(company);
     }
 
-    @PostMapping(value="/register-employee")
-    public ActionDTO registerEmployee(@RequestBody Employee employee)
+    @PostMapping(value="/register-employee/{companyId}")
+    public ActionDTO registerEmployee(@RequestBody Employee employee,@PathVariable Integer companyId)
     {
-        return this.companyService.registerEmployee(employee);
-    }
-    @GetMapping(value="/mailTest")
-    public String mailtest()
-
-    {
-        Employee employee=new Employee();
-        employee.setFirstName("Riya");
-        employee.setLastName("Punjabi");
-        employee.setEmailID("riyapunjabi2019@gmail.com");
-         this.companyService.registerEmployee(employee);
-         return "Riya";
+        return this.companyService.registerEmployee(employee,companyId);
     }
 
-    @RequestMapping("/employees")
-    public ActionDTO getEmployees()
+    @GetMapping("/employees/{companyId}")
+    public Set<Employee> getEmployees(@PathVariable Integer companyId)
     {
-        return null;
+        return companyService.getEmployees(companyId);
     }
 
-    @RequestMapping("/employees-by-status")
-    public ActionDTO getEmployeesByStatus()
+    @GetMapping("/employees-by-status/{companyId}/{status}")
+    public Set<Employee> getEmployeesByStatus(@PathVariable Integer companyId,@PathVariable String status)
     {
-        return null;
+        return companyService.getEmployeesByStatus(companyId,status);
     }
 
     @RequestMapping("/profile")
@@ -73,10 +66,19 @@ public class CompanyController {
         return null;
     }
 
-    @RequestMapping("/update-profile")
-    public ActionDTO updateProfile()
+    @PostMapping("/update-profile")
+    public ActionDTO updateProfile(Company company)
     {
-        return null;
+        return  companyService.updateCompanyProfile(company);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponse> handleException(RequiredFieldException exc) {
+        ExceptionResponse error = new ExceptionResponse();
+        error.setStatus(HttpStatus.LENGTH_REQUIRED.value());
+        error.setMessage(exc.getMessage());
+        error.setTimeStamp(System.currentTimeMillis());
+        return new ResponseEntity<>(error, HttpStatus.LENGTH_REQUIRED);
     }
 
 }

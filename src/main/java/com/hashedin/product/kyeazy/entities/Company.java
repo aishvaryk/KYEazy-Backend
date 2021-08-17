@@ -34,9 +34,14 @@ public class Company {
     @OneToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="addressId")
     private  Address address;
-
+/*
     @OneToMany(mappedBy = "company")
     private Set<Employee> employees = new HashSet<>();
+*/
 
+    @OneToMany(cascade=CascadeType.ALL)
+    @JoinColumn(name="company_id",referencedColumnName ="company_id" )
+    private Set<Employee> employees = new HashSet<>();
 
 }
+

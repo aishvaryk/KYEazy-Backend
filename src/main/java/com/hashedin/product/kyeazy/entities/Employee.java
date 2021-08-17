@@ -48,14 +48,19 @@ public class Employee {
     @Column(name="test_video_path")
     private  String testVideoPath;
    */
+
     @OneToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="addressId")
     private  Address address;
 
+    @Column(name="company_id")
+    private  Integer companyId;
+
+    /*
     @ManyToOne
     @MapsId("companyId")
     @JoinColumn(name="company_id")
     private Company company;
-
+    */
 
 }

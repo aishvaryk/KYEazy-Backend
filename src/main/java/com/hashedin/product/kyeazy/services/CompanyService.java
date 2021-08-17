@@ -15,7 +15,6 @@ public class CompanyService {
 
     private EmployeeRepository employeeRepository;
     private CompanyRepository companyRepository;
-
     private EmailSender emailSender;
 
     @Autowired
@@ -27,13 +26,10 @@ public class CompanyService {
 
     public ActionDTO register(Company company) {
 
-        //validation for username and company name uniqueness
         if (company.getName() == null || company.getName().length() == 0) {
             throw new RequiredFieldException("Company name can't be empty.");
         }
-        if (company.getCINNumber() == null || company.getCINNumber().length() == 0) {
-            throw new RequiredFieldException("First name can't be empty.");
-        }
+
         if (company.getCompanyDescription() == null || company.getCompanyDescription().length() == 0) {
             throw new RequiredFieldException("Company Description can't be empty.");
         }
@@ -41,21 +37,60 @@ public class CompanyService {
         return new ActionDTO(addedCompany.getCompanyId(), true, "Company Added Successfully");
     }
 
-    public ActionDTO registerEmployee(Employee employee) {
+    public ActionDTO registerEmployee(Employee employee,int companyId) {
 
         String username = this.generateUsername(employee);
         String passkey = String.valueOf(this.generatePassword(employee));
+
         String link="http://localhost:8085/employee/login";
         String mailBody="Hey "+employee.getFirstName()+","+"Your Id password for doing kyc is  Username: "+username+" Password:" +passkey +" Link:" +link;
         this.emailSender.sendMail(employee.getEmailID(),"Regarding KYC",mailBody);
-        employee.setUsername(username);
-        employee.setUsername(passkey);
-        employee.setStatus("Pending");
-        Employee addedEmployee = employeeRepository.save(employee);
 
-        return new ActionDTO(employee.getEmployeeId(), true, "Employee KYC Under Progress");
+        employee.setUsername(username);
+        employee.setPassword(passkey);
+        employee.setStatus("Pending");
+        employee.setCompanyId(companyId);
+
+        Employee addedEmployee = employeeRepository.save(employee);
+        return new ActionDTO(addedEmployee.getEmployeeId(), true, "Employee KYC Under Progress Wait for 2-3 days");
     }
 
+    public Set<Employee> getEmployees(Integer id)
+    {
+        Company company= companyRepository.getById(id);
+        return company.getEmployees();
+    }
+    public Set<Employee> getEmployeesByStatus(Integer id,String status){
+        Company company= companyRepository.getById(id);
+        Set<Employee> employee=company.getEmployees();
+        Set<Employee> employeesByStatus=null;
+        for(Employee e:employee){
+            if(e.getStatus().equals(status))
+                employeesByStatus.add(e);
+        }
+        return  employeesByStatus;
+    }
+
+    public ActionDTO updateCompanyProfile(Company companyDetails)
+    {
+        Integer companyId=companyDetails.getCompanyId();
+        Company company=companyRepository.findById(companyId).get();
+
+        if(company==null)
+        {
+            throw new RequiredFieldException("The given Company is not registered !!!!!");
+        }
+        if (companyDetails.getName() == null || companyDetails.getName().length() == 0) {
+            throw new RequiredFieldException("Company name can't be empty.");
+        }
+
+        company.setCompanyDescription(companyDetails.getCompanyDescription());
+        company.setAddress(companyDetails.getAddress());
+        company.setEmployees(company.getEmployees());
+        company.setName(company.getName());
+        Company companyUpdated= companyRepository.save(company);
+        return new ActionDTO(companyUpdated.getCompanyId(), true, "Company details Updated");
+    }
 
 
     private String generateUsername(Employee employee) {
@@ -90,33 +125,6 @@ public class CompanyService {
         }
         return password;
 
-    }
-    public Set<Employee> getEmployees(Integer id)
-    {
-        Company company= companyRepository.getById(id);
-        return company.getEmployees();
-    }
-    public Set<Employee> getEmployeesByStatus(Integer id,String status){
-        Company company= companyRepository.getById(id);
-        Set<Employee> employee=company.getEmployees();
-        Set<Employee> employeesByStatus=null;
-        for(Employee e:employee){
-            if(e.getStatus().equals(status))
-                employeesByStatus.add(e);
-        }
-        return  employeesByStatus;
-    }
-
-    public ActionDTO updateProfile(Company companyDetails)
-    {
-        Integer id=companyDetails.getCompanyId();
-        Company company=companyRepository.findById(id).get();
-        company.setCompanyDescription(companyDetails.getCompanyDescription());
-        company.setAddress(companyDetails.getAddress());
-        company.setEmployees(company.getEmployees());
-        company.setName(company.getName());
-        companyRepository.save(company);
-        return null;
     }
 
     }

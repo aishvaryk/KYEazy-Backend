@@ -6,10 +6,9 @@ import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.repositories.CompanyRepository;
 import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
+import org.springframework.stereotype.Service;
 import java.util.Set;
-
+@Service
 public class AdminService {
     @Autowired
     EmployeeRepository employeeRepository;
