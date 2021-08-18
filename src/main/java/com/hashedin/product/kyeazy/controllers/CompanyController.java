@@ -11,6 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -55,21 +61,37 @@ public class CompanyController {
         return companyService.getEmployeesByStatus(companyId, status);
     }
 
-    @GetMapping("/get-company-details")
-    public ActionDTO getCompanyDetails() {
-        return null;
+    @GetMapping("/get-company-details/{id}")
+    public Company getCompanyDetails(@PathVariable Integer id) {
+        return companyService.getCompanyDetails(id);
     }
 
     @GetMapping("/get-employees-sorted-by-name")
-    public ActionDTO getEmployeesSortedByName() {
-        return null;
+    public List<Employee> getEmployeesSortedByName() {
+        return companyService.getEmployeesSortedByName();
     }
 
-    @RequestMapping("/get-employees-by-name")
-    public ActionDTO getEmployeeByName() {
-        return null;
+    @GetMapping ("/get-employees-by-name/{id}/{name}")
+    public Employee getEmployeeByName(@PathVariable Integer id, @PathVariable String name) {
+        return companyService.getEmployeeByName(id,name);
     }
 
+    @GetMapping ("/get-employees-with-pending-kyc/{id}")
+    public List<Employee> getEmployeesWithPendingKYC(@PathVariable Integer id){
+        return companyService.getEmployeesWithPendingKYC(id);
+    }
+
+    @GetMapping ("/get-employees-with-rejected-kyc/{id}")
+    public List<Employee> getEmployeesWithRejectedKYC(@PathVariable Integer id){
+        return companyService.getEmployeesWithRejectedKYC(id);
+    }
+
+    @GetMapping ("/get-employees-by-date-of-application/{date}")
+    public List<Employee> getEmployeesByDateOfApplication(@PathVariable String date){
+        //Instant timestamp = null;
+        //LocalDateTime dateTime = LocalDateTime.parse("2018-05-05T11:50:55");
+        return companyService.getEmployeesByDateOfApplication(date);
+    }
 
     @RequestMapping("/profile")
     public ActionDTO viewProfile() {

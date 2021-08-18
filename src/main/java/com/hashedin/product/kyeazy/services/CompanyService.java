@@ -7,8 +7,11 @@ import com.hashedin.product.kyeazy.repositories.CompanyRepository;
 import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class CompanyService {
@@ -131,36 +134,33 @@ public class CompanyService {
         return password;
 
     }
-    public ActionDTO getCompanyDetails(Integer id)
+    public Company getCompanyDetails(Integer id)
     {
         Company company=companyRepository.findById(id).get();
-        return new ActionDTO();
+        return company;
     }
-    public List<Employee> getEmployeeByName(Integer companyId,String name)
+    public Employee getEmployeeByName(Integer companyId,String name)
     {   Company company=companyRepository.findById(companyId).get();
         Set<Employee> employeeList=company.getEmployees();
-        List<Employee> employees=null;
-        for(Employee e:employeeList){
-            if(e.getFirstName().equals(name))
-                employees.add(e);
-        }
-        return  employees;
+        return  employeeList.stream()
+                .filter(employee -> name.equals(employee.getFirstName()+employee.getLastName()))
+                .findAny()
+                .orElse(null);
     }
 
     public List<Employee> getEmployeesSortedByName()
     {
         List<Employee> employee=employeeRepository.findAll();
-        employee.sort(new ComparatorService());
-        return  employee;
+        return employee.stream().sorted(Comparator.comparing(Employee::getFirstName)).collect(Collectors.toList());
     }
 
     public List<Employee> getEmployeesWithPendingKYC(Integer id)
     {
         Company company=companyRepository.findById(id).get();
         Set<Employee> employee=company.getEmployees();
-        List<Employee> pendingEmployees = null;
+        List<Employee> pendingEmployees = new LinkedList<>();
         for(Employee e:employee){
-            if(e.getStatus().equals("pending"))
+            if(e.getStatus().equals("Pending"))
                 pendingEmployees.add(e);
         }
         return pendingEmployees;
@@ -169,21 +169,25 @@ public class CompanyService {
     {
         Company company=companyRepository.findById(id).get();
         Set<Employee> employee=company.getEmployees();
-        List<Employee> rejectedEmployees = null;
+        List<Employee> rejectedEmployees = new LinkedList<>();
         for(Employee e:employee){
-            if(e.getStatus().equals("rejected"))
+            if(e.getStatus().equals("Rejected"))
                 rejectedEmployees.add(e);
         }
         return rejectedEmployees;
     }
 
-    public List<Employee> getEmployeesByDateOfApplication(Date date)
+    public List<Employee> getEmployeesByDateOfApplication(String date)
     {
         List<Employee> employeeList=employeeRepository.findAll();
-        List<Employee> employees=null;
+        List<Employee> employees=new LinkedList<>();
         for(Employee e:employeeList){
-            if(e.getDateTimeOfVerification().equals(date))
+            String s=e.getDateTimeOfApplication().toString();
+            if(s.equals(date))
+            {
                 employees.add(e);
+            }
+
         }
         return  employees;
     }
