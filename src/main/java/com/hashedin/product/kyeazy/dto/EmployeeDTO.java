@@ -21,12 +21,11 @@ public class EmployeeDTO {
     private String documentType;
     private String documentNumber;
     private String emailID;
-    private byte[] capturedImage;
     private String status;
     private Date dateTimeOfVerification;
     private Date dateTimeOfApplication;
     private Address address;
     private  Integer companyId;
+    //private byte[] capturedImage;
 
-
-    }
+}

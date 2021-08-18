@@ -9,6 +9,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,11 +40,6 @@ public class EmployeeService {
         Employee savedEmployee = employeeRepository.save(employee);
         return new ActionDTO(savedEmployee.getEmployeeId(),true,"Employee Details Added Successfully.");
     }
-    public byte[] getEmployeeImage(Integer employeeId) {
-        Employee employee=employeeRepository.findById(employeeId).get();
-        byte[] profilePictureBytes = employee.getCapturedImage();
-        return profilePictureBytes;
-    }
 
     public ActionDTO updateEmployeeVideo(Integer employeeId, MultipartFile profileVideo) throws IOException
     {
@@ -68,5 +64,11 @@ public class EmployeeService {
 
 
         return new ActionDTO(1,true,"Employee Details Added Successfully.");
+    }
+    @Transactional
+    public Employee getEmployeeData(Integer employeeId) {
+
+        return employeeRepository.findById(employeeId).get();
+
     }
 }

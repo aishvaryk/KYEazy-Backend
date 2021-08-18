@@ -60,4 +60,10 @@ public class AdminService {
         employee.setStatus(status);
         employeeRepository.save(employee);
     }
+    public byte[] getEmployeeImage(Integer employeeId) {
+        Employee employee=employeeRepository.findById(employeeId).get();
+        byte[] profilePictureBytes = employee.getCapturedImage();
+        return profilePictureBytes;
+    }
+
 }

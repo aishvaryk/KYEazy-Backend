@@ -87,24 +87,6 @@ public class CompanyService {
         return  employeeDTOS;
     }
 
-    private EmployeeDTO parseEmployee(Employee employee)
-    {
-        EmployeeDTO employeeDTO=new EmployeeDTO();
-        employeeDTO.setAddress(employee.getAddress());
-        employeeDTO.setEmployeeId(employee.getEmployeeId());
-        employeeDTO.setFirstName(employee.getFirstName());
-        employeeDTO.setLastName(employee.getLastName());
-        employeeDTO.setContactNumber(employee.getContactNumber());
-        employeeDTO.setEmailID(employee.getEmailID());
-        employeeDTO.setDateTimeOfApplication(employee.getDateTimeOfApplication());
-        employeeDTO.setDateTimeOfVerification(employee.getDateTimeOfVerification());
-        employeeDTO.setDocumentNumber(employee.getDocumentNumber());
-        employeeDTO.setCompanyId(employee.getCompanyId());
-        employeeDTO.setDocumentType(employee.getDocumentType());
-
-      //  employeeDTO.setCapturedImage(employee.getCapturedImage());
-        return  employeeDTO;
-    }
 
     @Transactional
     public Set<Employee> getEmployeesByStatus(Integer companyId,String status){
@@ -127,7 +109,83 @@ public class CompanyService {
         Company companyUpdated= companyRepository.save(company);
         return new ActionDTO(companyUpdated.getCompanyId(), true, "Company details Updated");
     }
+    public ActionDTO getCompanyDetails(Integer id)
+    {
+        Company company=companyRepository.findById(id).get();
+        return new ActionDTO();
+    }
+    @Transactional
+    public List<Employee> getEmployeeByName(Integer companyId,String name)
+    {
+        Company company=companyRepository.findById(companyId).get();
+        Set<Employee> employeeList=company.getEmployees();
+        List<Employee> employees=new LinkedList<>();
+        for(Employee e:employeeList){
+            if(e.getFirstName().equals(name)) employees.add(e);
+        }
+        return  employees;
+    }
+    @Transactional
+    public List<Employee> getEmployeesSortedByName()
+    {
+        List<Employee> employee=employeeRepository.findAll();
+        //employee.sort(new ComparatorService());
+        return  employee;
+    }
+    @Transactional
+    public List<Employee> getEmployeesWithPendingKYC(Integer id)
+    {
+        Company company=companyRepository.findById(id).get();
+        Set<Employee> employee=company.getEmployees();
+        List<Employee> pendingEmployees = new LinkedList<>();
+        for(Employee e:employee){
+            if(e.getStatus().equals("pending"))
+                pendingEmployees.add(e);
+        }
+        return pendingEmployees;
+    }
+    @Transactional
+    public List<Employee> getEmployeesWithRejectedKYC(Integer id)
+    {
+        Company company=companyRepository.findById(id).get();
+        Set<Employee> employee=company.getEmployees();
+        List<Employee> rejectedEmployees = new LinkedList<>();
+        for(Employee e:employee){
+            if(e.getStatus().equals("rejected"))
+                rejectedEmployees.add(e);
+        }
+        return rejectedEmployees;
+    }
+    @Transactional
+    public List<Employee> getEmployeesByDateOfApplication(Date date)
+    {
+        List<Employee> employeeList=employeeRepository.findAll();
+        List<Employee> employees=new LinkedList<>();
+        for(Employee e:employeeList){
+            if(e.getDateTimeOfVerification().equals(date))
+                employees.add(e);
+        }
+        return  employees;
+    }
+    private EmployeeDTO parseEmployee(Employee employee)
+    {
+        EmployeeDTO employeeDTO=new EmployeeDTO();
+        employeeDTO.setAddress(employee.getAddress());
+        employeeDTO.setUsername(employee.getUsername());
+        employeeDTO.setEmployeeId(employee.getEmployeeId());
+        employeeDTO.setFirstName(employee.getFirstName());
+        employeeDTO.setLastName(employee.getLastName());
+        employeeDTO.setContactNumber(employee.getContactNumber());
+        employeeDTO.setEmailID(employee.getEmailID());
+        employeeDTO.setDateTimeOfApplication(employee.getDateTimeOfApplication());
+        employeeDTO.setDateTimeOfVerification(employee.getDateTimeOfVerification());
+        employeeDTO.setDocumentNumber(employee.getDocumentNumber());
+        employeeDTO.setCompanyId(employee.getCompanyId());
+        employeeDTO.setDocumentType(employee.getDocumentType());
 
+        //  employeeDTO.setCapturedImage(employee.getCapturedImage());
+        return  employeeDTO;
+    }
 
     private String generateUsername(Employee employee) {
         String username="";
@@ -161,64 +219,6 @@ public class CompanyService {
         }
         return password;
 
-    }
-    public ActionDTO getCompanyDetails(Integer id)
-    {
-        Company company=companyRepository.findById(id).get();
-        return new ActionDTO();
-    }
-    @Transactional
-    public List<Employee> getEmployeeByName(Integer companyId,String name)
-    {
-        Company company=companyRepository.findById(companyId).get();
-        Set<Employee> employeeList=company.getEmployees();
-        List<Employee> employees=new LinkedList<>();
-        for(Employee e:employeeList){
-            if(e.getFirstName().equals(name)) employees.add(e);
-        }
-        return  employees;
-    }
-    @Transactional
-    public List<Employee> getEmployeesSortedByName()
-    {
-        List<Employee> employee=employeeRepository.findAll();
-        employee.sort(new ComparatorService());
-        return  employee;
-    }
-    @Transactional
-    public List<Employee> getEmployeesWithPendingKYC(Integer id)
-    {
-        Company company=companyRepository.findById(id).get();
-        Set<Employee> employee=company.getEmployees();
-        List<Employee> pendingEmployees = null;
-        for(Employee e:employee){
-            if(e.getStatus().equals("pending"))
-                pendingEmployees.add(e);
-        }
-        return pendingEmployees;
-    }
-    @Transactional
-    public List<Employee> getEmployeesWithRejectedKYC(Integer id)
-    {
-        Company company=companyRepository.findById(id).get();
-        Set<Employee> employee=company.getEmployees();
-        List<Employee> rejectedEmployees = null;
-        for(Employee e:employee){
-            if(e.getStatus().equals("rejected"))
-                rejectedEmployees.add(e);
-        }
-        return rejectedEmployees;
-    }
-    @Transactional
-    public List<Employee> getEmployeesByDateOfApplication(Date date)
-    {
-        List<Employee> employeeList=employeeRepository.findAll();
-        List<Employee> employees=null;
-        for(Employee e:employeeList){
-            if(e.getDateTimeOfVerification().equals(date))
-                employees.add(e);
-        }
-        return  employees;
     }
 
 
