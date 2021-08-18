@@ -1,6 +1,7 @@
 package com.hashedin.product.kyeazy.controllers;
 
 import com.hashedin.product.kyeazy.dto.ActionDTO;
+import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.exceptions.RequiredFieldException;
@@ -11,11 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -51,13 +47,13 @@ public class CompanyController {
     }
 
     @GetMapping("/employees/{companyId}")
-    public Set<Employee> getEmployees(@PathVariable Integer companyId) {
+    public Set<EmployeeDTO> getEmployees(@PathVariable Integer companyId) {
         return companyService.getEmployees(companyId);
     }
 
     //error
     @GetMapping("/employees-by-status/{companyId}/{status}")
-    public Set<Employee> getEmployeesByStatus(@PathVariable Integer companyId, @PathVariable String status) {
+    public Set<EmployeeDTO> getEmployeesByStatus(@PathVariable Integer companyId, @PathVariable String status) {
         return companyService.getEmployeesByStatus(companyId, status);
     }
 
@@ -67,27 +63,28 @@ public class CompanyController {
     }
 
     @GetMapping("/get-employees-sorted-by-name")
-    public List<Employee> getEmployeesSortedByName() {
+    public Set<EmployeeDTO> getEmployeesSortedByName() {
         return companyService.getEmployeesSortedByName();
     }
 
-    @GetMapping ("/get-employees-by-name/{id}/{name}")
-    public Employee getEmployeeByName(@PathVariable Integer id, @PathVariable String name) {
+
+    @GetMapping("/get-employees-by-name/{id}/{name}")
+    public EmployeeDTO getEmployeeByName(@PathVariable Integer id, @PathVariable String name) {
         return companyService.getEmployeeByName(id,name);
     }
 
     @GetMapping ("/get-employees-with-pending-kyc/{id}")
-    public List<Employee> getEmployeesWithPendingKYC(@PathVariable Integer id){
+    public Set<EmployeeDTO> getEmployeesWithPendingKYC(@PathVariable Integer id){
         return companyService.getEmployeesWithPendingKYC(id);
     }
 
     @GetMapping ("/get-employees-with-rejected-kyc/{id}")
-    public List<Employee> getEmployeesWithRejectedKYC(@PathVariable Integer id){
+    public Set<EmployeeDTO> getEmployeesWithRejectedKYC(@PathVariable Integer id){
         return companyService.getEmployeesWithRejectedKYC(id);
     }
 
     @GetMapping ("/get-employees-by-date-of-application/{date}")
-    public List<Employee> getEmployeesByDateOfApplication(@PathVariable String date){
+    public Set<EmployeeDTO> getEmployeesByDateOfApplication(@PathVariable String date){
         //Instant timestamp = null;
         //LocalDateTime dateTime = LocalDateTime.parse("2018-05-05T11:50:55");
         return companyService.getEmployeesByDateOfApplication(date);

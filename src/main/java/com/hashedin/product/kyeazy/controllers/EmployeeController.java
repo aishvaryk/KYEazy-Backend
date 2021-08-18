@@ -4,12 +4,15 @@ import com.hashedin.product.kyeazy.dto.ActionDTO;
 import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import java.io.IOException;
 
 @RestController
 @RequestMapping("/employee")
 public class EmployeeController {
+
     @Autowired
     EmployeeService employeeService;
 
@@ -25,15 +28,26 @@ public class EmployeeController {
         return null;
     }
 
-    @RequestMapping("/submit")
-    public ActionDTO submit(Employee employee)
+    @PatchMapping(value="/update-profile/{id}/profile-pictures",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ActionDTO updateProfileImage(@PathVariable Integer id, @RequestParam("profilePicture") MultipartFile profilePicture) throws IOException
     {
-        return employeeService.submit(employee);
+        return  employeeService.updateEmployeeImage(id,profilePicture);
     }
 
-    @RequestMapping("/update-profile")
-    public ActionDTO updateProfile(Employee employee)
+    @PatchMapping(value="/update-video/{id}/video",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ActionDTO updateVideo(@PathVariable Integer id, @RequestParam("employeeVideo") MultipartFile employeeVideo) throws IOException
     {
-        return  employeeService.updateProfile(employee);
+        return  employeeService.updateEmployeeVideo(id,employeeVideo);
+    }
+
+    @PatchMapping("/update-profile")
+    public ActionDTO updateProfile(@RequestBody  Employee employee)
+    {
+        return  employeeService.updateProfileData(employee);
+    }
+    @GetMapping("/view-profile/{employeeId}")
+    public Employee viewProfile(@PathVariable Integer employeeId)
+    {
+        return  employeeService.getEmployeeData(employeeId);
     }
 }

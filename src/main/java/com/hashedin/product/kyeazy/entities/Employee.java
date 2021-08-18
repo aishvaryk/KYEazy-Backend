@@ -31,6 +31,12 @@ public class Employee {
     @Column(name="contact_number")
     private String contactNumber;
 
+    @Column(name="document_type")
+    private String documentType;
+
+    @Column(name="document_Number")
+    private String documentNumber;
+
     @Column(name="email_id")
     private String emailID;
 

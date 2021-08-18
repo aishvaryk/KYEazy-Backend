@@ -1,5 +1,6 @@
 package com.hashedin.product.kyeazy.services;
 import com.hashedin.product.kyeazy.dto.ActionDTO;
+import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.exceptions.RequiredFieldException;
@@ -7,11 +8,9 @@ import com.hashedin.product.kyeazy.repositories.CompanyRepository;
 import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class CompanyService {
@@ -73,15 +72,32 @@ public class CompanyService {
         Employee addedEmployee = employeeRepository.save(employee);
         return new ActionDTO(addedEmployee.getEmployeeId(), true, "Employee KYC Under Progress Wait for 2-3 days");
     }
-
-    public Set<Employee> getEmployees(Integer id)
+@Transactional
+    public Set<EmployeeDTO> getEmployees(Integer id)
     {
         Company company= companyRepository.getById(id);
-        return company.getEmployees();
+
+        Set<EmployeeDTO> employeeDTOS=new HashSet<>();
+        for(Employee employee:company.getEmployees())
+        {
+            employeeDTOS.add(parseEmployee(employee));
+        }
+
+        return  employeeDTOS;
     }
-    public Set<Employee> getEmployeesByStatus(Integer companyId,String status){
+
+
+    @Transactional
+    public Set<EmployeeDTO> getEmployeesByStatus(Integer companyId, String status){
+        Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         Company company= companyRepository.getById(companyId);
-        return company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase(status);}).collect(Collectors.toSet());
+        Set<Employee> employeesbyStatus=company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase(status);}).collect(Collectors.toSet());
+        for(Employee e:employeesbyStatus)
+        {
+            employeeDTOS.add(parseEmployee(e));
+        }
+
+        return  employeeDTOS;
     }
 
     public ActionDTO updateCompanyProfile(Company companyDetails)
@@ -139,46 +155,56 @@ public class CompanyService {
         Company company=companyRepository.findById(id).get();
         return company;
     }
-    public Employee getEmployeeByName(Integer companyId,String name)
-    {   Company company=companyRepository.findById(companyId).get();
-        Set<Employee> employeeList=company.getEmployees();
-        return  employeeList.stream()
-                .filter(employee -> name.equals(employee.getFirstName()+employee.getLastName()))
+    public EmployeeDTO getEmployeeByName(Integer companyId,String name) {
+        Company company = companyRepository.findById(companyId).get();
+        Set<Employee> employeeList = company.getEmployees();
+        Employee employeebyname= employeeList.stream()
+                .filter(employee -> name.equals(employee.getFirstName() + employee.getLastName()))
                 .findAny()
                 .orElse(null);
+        return parseEmployee(employeebyname);
     }
-
-    public List<Employee> getEmployeesSortedByName()
+    public Set<EmployeeDTO> getEmployeesSortedByName()
     {
+        Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         List<Employee> employee=employeeRepository.findAll();
-        return employee.stream().sorted(Comparator.comparing(Employee::getFirstName)).collect(Collectors.toList());
+        List<Employee> employeeSorted= employee.stream().sorted(Comparator.comparing(Employee::getFirstName)).collect(Collectors.toList());
+        for(Employee e:employeeSorted)
+        {
+            employeeDTOS.add(parseEmployee(e));
+        }
+        return employeeDTOS;
     }
 
-    public List<Employee> getEmployeesWithPendingKYC(Integer id)
-    {
+    @Transactional
+    public Set<EmployeeDTO> getEmployeesWithPendingKYC(Integer id)
+    {   Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         Company company=companyRepository.findById(id).get();
         Set<Employee> employee=company.getEmployees();
-        List<Employee> pendingEmployees = new LinkedList<>();
-        for(Employee e:employee){
-            if(e.getStatus().equals("Pending"))
-                pendingEmployees.add(e);
+        Set<Employee> pendingEmployees =company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Pending");}).collect(Collectors.toSet());
+        for(Employee e:pendingEmployees)
+        {
+            employeeDTOS.add(parseEmployee(e));
         }
-        return pendingEmployees;
+        return employeeDTOS;
     }
-    public List<Employee> getEmployeesWithRejectedKYC(Integer id)
+    @Transactional
+    public Set<EmployeeDTO> getEmployeesWithRejectedKYC(Integer id)
     {
+        Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         Company company=companyRepository.findById(id).get();
         Set<Employee> employee=company.getEmployees();
-        List<Employee> rejectedEmployees = new LinkedList<>();
-        for(Employee e:employee){
-            if(e.getStatus().equals("Rejected"))
-                rejectedEmployees.add(e);
+        Set<Employee> rejectedEmployees = company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Rejected");}).collect(Collectors.toSet());
+        for(Employee e:rejectedEmployees)
+        {
+            employeeDTOS.add(parseEmployee(e));
         }
-        return rejectedEmployees;
+        return employeeDTOS;
     }
-
-    public List<Employee> getEmployeesByDateOfApplication(String date)
+    @Transactional
+    public Set<EmployeeDTO> getEmployeesByDateOfApplication(String date)
     {
+        Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         List<Employee> employeeList=employeeRepository.findAll();
         List<Employee> employees=new LinkedList<>();
         for(Employee e:employeeList){
@@ -189,8 +215,65 @@ public class CompanyService {
             }
 
         }
-        return  employees;
+        for(Employee e:employees)
+        {
+            employeeDTOS.add(parseEmployee(e));
+        }
+        return employeeDTOS;
     }
+    private EmployeeDTO parseEmployee(Employee employee)
+    {
+        EmployeeDTO employeeDTO=new EmployeeDTO();
+        employeeDTO.setAddress(employee.getAddress());
+        employeeDTO.setUsername(employee.getUsername());
+        employeeDTO.setEmployeeId(employee.getEmployeeId());
+        employeeDTO.setFirstName(employee.getFirstName());
+        employeeDTO.setLastName(employee.getLastName());
+        employeeDTO.setContactNumber(employee.getContactNumber());
+        employeeDTO.setEmailID(employee.getEmailID());
+        employeeDTO.setDateTimeOfApplication(employee.getDateTimeOfApplication());
+        employeeDTO.setDateTimeOfVerification(employee.getDateTimeOfVerification());
+        employeeDTO.setDocumentNumber(employee.getDocumentNumber());
+        employeeDTO.setCompanyId(employee.getCompanyId());
+        employeeDTO.setDocumentType(employee.getDocumentType());
+
+        //  employeeDTO.setCapturedImage(employee.getCapturedImage());
+        return  employeeDTO;
+    }
+//
+//    private String generateUsername(Employee employee) {
+//        String username="";
+//        UUID uuid = UUID.randomUUID();
+//        String uuidAsString = uuid.toString();
+//        username+=employee.getFirstName().substring(0,1);
+//        username+=employee.getLastName();
+//        username+=uuidAsString.substring(0,3);
+//        return username;
+//    }
+//
+//    private static char[] generatePassword(Employee employee)
+//    {
+//        String name=employee.getFirstName();
+//
+//        String capitalCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+//        String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
+//        String specialCharacters = "!@#$_";
+//        String numbers = "1234567890";
+//        String combinedChars = capitalCaseLetters + lowerCaseLetters + specialCharacters + numbers;
+//        Random random = new Random();
+//        char[] password = new char[7];
+//        password[0] = name.toUpperCase().charAt(0);
+//        password[1] = name.toLowerCase().charAt(1);
+//        password[2] = name.toLowerCase().charAt(2);
+//        password[3] = numbers.charAt(random.nextInt(numbers.length()));
+//        password[4] = specialCharacters.charAt(random.nextInt(specialCharacters.length()));
+//
+//        for(int i = 5; i< 7 ; i++) {
+//            password[i] = combinedChars.charAt(random.nextInt(combinedChars.length()));
+//        }
+//        return password;
+//
+//    }
 
 
 }
