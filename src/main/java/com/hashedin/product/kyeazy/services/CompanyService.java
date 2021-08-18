@@ -7,8 +7,8 @@ import com.hashedin.product.kyeazy.repositories.CompanyRepository;
 import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class CompanyService {
@@ -63,6 +63,7 @@ public class CompanyService {
 
         employee.setUsername(username);
         employee.setPassword(passkey);
+
         employee.setStatus("Pending");
         employee.setDateTimeOfApplication(new Date());
         employee.setCompanyId(companyId);
@@ -75,23 +76,15 @@ public class CompanyService {
         Company company= companyRepository.getById(id);
         return company.getEmployees();
     }
-    public Set<Employee> getEmployeesByStatus(Integer id,String status){
-        Company company= companyRepository.getById(id);
-        Set<Employee> employee=company.getEmployees();
-        Set<Employee> employeesByStatus=null;
-        for(Employee e:employee){
-            if(e.getStatus().equals(status))
-                employeesByStatus.add(e);
-        }
-        return  employeesByStatus;
+    public Set<Employee> getEmployeesByStatus(Integer companyId,String status){
+        Company company= companyRepository.getById(companyId);
+        return company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase(status);}).collect(Collectors.toSet());
     }
 
     public ActionDTO updateCompanyProfile(Company companyDetails)
     {
-
         Integer companyId=companyDetails.getCompanyId();
-
-       Optional<Company> companyIdToCheck =companyRepository.findById(companyId);
+        Optional<Company> companyIdToCheck =companyRepository.findById(companyId);
 
         if(companyIdToCheck.isEmpty())  throw new RequiredFieldException("The given Company is not registered !!!!!");
         Company company=companyIdToCheck.get();
