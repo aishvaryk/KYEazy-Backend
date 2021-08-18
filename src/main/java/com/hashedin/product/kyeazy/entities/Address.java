@@ -34,6 +34,5 @@ public class Address {
 
         @Column(name="type")
         private String type;
-
 }
 

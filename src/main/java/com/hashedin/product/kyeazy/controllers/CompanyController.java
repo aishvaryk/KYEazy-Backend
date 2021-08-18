@@ -53,7 +53,7 @@ public class CompanyController {
     {
         return companyService.getEmployees(companyId);
     }
-
+//error
     @GetMapping("/employees-by-status/{companyId}/{status}")
     public Set<Employee> getEmployeesByStatus(@PathVariable Integer companyId,@PathVariable String status)
     {
@@ -66,8 +66,8 @@ public class CompanyController {
         return null;
     }
 
-    @PostMapping("/update-profile")
-    public ActionDTO updateProfile(Company company)
+    @PatchMapping("/update-profile")
+    public ActionDTO updateProfile(@RequestBody  Company company)
     {
         return  companyService.updateCompanyProfile(company);
     }

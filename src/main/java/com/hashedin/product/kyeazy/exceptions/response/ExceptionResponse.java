@@ -10,7 +10,6 @@ import lombok.Setter;
 
 public class ExceptionResponse
 {
-
         private int status;
         private String message;
         private long timeStamp;

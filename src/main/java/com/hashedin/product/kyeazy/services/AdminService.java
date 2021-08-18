@@ -1,6 +1,4 @@
 package com.hashedin.product.kyeazy.services;
-
-import com.hashedin.product.kyeazy.dto.ActionDTO;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.repositories.CompanyRepository;
@@ -8,6 +6,7 @@ import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Set;
+
 @Service
 public class AdminService {
     @Autowired

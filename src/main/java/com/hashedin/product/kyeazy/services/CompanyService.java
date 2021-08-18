@@ -7,9 +7,9 @@ import com.hashedin.product.kyeazy.repositories.CompanyRepository;
 import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.Random;
-import java.util.Set;
-import java.util.UUID;
+
+import java.util.*;
+
 @Service
 public class CompanyService {
 
@@ -26,6 +26,7 @@ public class CompanyService {
 
     public ActionDTO register(Company company) {
 
+        //company uniqueness check
         if (company.getName() == null || company.getName().length() == 0) {
             throw new RequiredFieldException("Company name can't be empty.");
         }
@@ -39,18 +40,32 @@ public class CompanyService {
 
     public ActionDTO registerEmployee(Employee employee,int companyId) {
 
+        //find By Email Verification
+        if (employee.getContactNumber() == null || employee.getContactNumber().length() == 0) {
+            throw new RequiredFieldException("Please enter contact Number.");
+        }
+        if (employee.getEmailID() == null || employee.getEmailID().length() == 0) {
+            throw new RequiredFieldException("Please Enter email Id.");
+        }
+        if (employee.getFirstName() == null || employee.getFirstName().length() == 0) {
+            throw new RequiredFieldException("Please Enter employee first name");
+        }
+
+        if (employee.getLastName() == null || employee.getLastName().length() == 0) {
+            throw new RequiredFieldException("Please Enter employee Last name");
+        }
         String username = this.generateUsername(employee);
         String passkey = String.valueOf(this.generatePassword(employee));
 
         String link="http://localhost:8085/employee/login";
         String mailBody="Hey "+employee.getFirstName()+","+"Your Id password for doing kyc is  Username: "+username+" Password:" +passkey +" Link:" +link;
-        this.emailSender.sendMail(employee.getEmailID(),"Regarding KYC",mailBody);
+        //this.emailSender.sendMail(employee.getEmailID(),"Regarding KYC",mailBody);
 
         employee.setUsername(username);
         employee.setPassword(passkey);
         employee.setStatus("Pending");
+        employee.setDateTimeOfApplication(new Date());
         employee.setCompanyId(companyId);
-
         Employee addedEmployee = employeeRepository.save(employee);
         return new ActionDTO(addedEmployee.getEmployeeId(), true, "Employee KYC Under Progress Wait for 2-3 days");
     }
@@ -73,21 +88,22 @@ public class CompanyService {
 
     public ActionDTO updateCompanyProfile(Company companyDetails)
     {
-        Integer companyId=companyDetails.getCompanyId();
-        Company company=companyRepository.findById(companyId).get();
 
-        if(company==null)
-        {
-            throw new RequiredFieldException("The given Company is not registered !!!!!");
-        }
+        Integer companyId=companyDetails.getCompanyId();
+
+       Optional<Company> companyIdToCheck =companyRepository.findById(companyId);
+
+        if(companyIdToCheck.isEmpty())  throw new RequiredFieldException("The given Company is not registered !!!!!");
+        Company company=companyIdToCheck.get();
+
         if (companyDetails.getName() == null || companyDetails.getName().length() == 0) {
             throw new RequiredFieldException("Company name can't be empty.");
         }
 
         company.setCompanyDescription(companyDetails.getCompanyDescription());
-        company.setAddress(companyDetails.getAddress());
         company.setEmployees(company.getEmployees());
-        company.setName(company.getName());
+        company.setName(companyDetails.getName());
+        company.setAddress(companyDetails.getAddress());
         Company companyUpdated= companyRepository.save(company);
         return new ActionDTO(companyUpdated.getCompanyId(), true, "Company details Updated");
     }

@@ -44,6 +44,9 @@ public class Employee {
     @Column(name="date_time_of_verification")
     private Date dateTimeOfVerification;
 
+    @Column(name="date_time_of_application")
+    private Date dateTimeOfApplication;
+
     /*
     @Column(name="test_video_path")
     private  String testVideoPath;
