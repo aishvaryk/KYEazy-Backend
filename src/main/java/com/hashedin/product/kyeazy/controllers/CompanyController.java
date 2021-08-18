@@ -20,57 +20,65 @@ public class CompanyController {
     private CompanyService companyService;
 
     @Autowired
-    public CompanyController(CompanyService companyService)
-    {
-        this.companyService=companyService;
+    public CompanyController(CompanyService companyService) {
+        this.companyService = companyService;
     }
 
     @RequestMapping("/login")
-    public ActionDTO login()
-    {
+    public ActionDTO login() {
         return null;
     }
 
     @RequestMapping("/logout")
-    public ActionDTO logout()
-    {
+    public ActionDTO logout() {
         return null;
     }
 
-    @PostMapping(value="/register")
-    public ActionDTO register(@RequestBody Company company)
-    {
+    @PostMapping(value = "/register")
+    public ActionDTO register(@RequestBody Company company) {
         return companyService.register(company);
     }
 
-    @PostMapping(value="/register-employee/{companyId}")
-    public ActionDTO registerEmployee(@RequestBody Employee employee,@PathVariable Integer companyId)
-    {
-        return this.companyService.registerEmployee(employee,companyId);
+    @PostMapping(value = "/register-employee/{companyId}")
+    public ActionDTO registerEmployee(@RequestBody Employee employee, @PathVariable Integer companyId) {
+        return this.companyService.registerEmployee(employee, companyId);
     }
 
     @GetMapping("/employees/{companyId}")
-    public Set<Employee> getEmployees(@PathVariable Integer companyId)
-    {
+    public Set<Employee> getEmployees(@PathVariable Integer companyId) {
         return companyService.getEmployees(companyId);
     }
-//error
+
+    //error
     @GetMapping("/employees-by-status/{companyId}/{status}")
-    public Set<Employee> getEmployeesByStatus(@PathVariable Integer companyId,@PathVariable String status)
-    {
-        return companyService.getEmployeesByStatus(companyId,status);
+    public Set<Employee> getEmployeesByStatus(@PathVariable Integer companyId, @PathVariable String status) {
+        return companyService.getEmployeesByStatus(companyId, status);
     }
 
+    @GetMapping("/get-company-details")
+    public ActionDTO getCompanyDetails() {
+        return null;
+    }
+
+    @GetMapping("/get-employees-sorted-by-name")
+    public ActionDTO getEmployeesSortedByName() {
+        return null;
+    }
+
+    @RequestMapping("/get-employees-by-name")
+    public ActionDTO getEmployeeByName() {
+        return null;
+    }
+
+
     @RequestMapping("/profile")
-    public ActionDTO viewProfile()
-    {
+    public ActionDTO viewProfile() {
         return null;
     }
 
     @PatchMapping("/update-profile")
-    public ActionDTO updateProfile(@RequestBody  Company company)
-    {
-        return  companyService.updateCompanyProfile(company);
+    public ActionDTO updateProfile(@RequestBody Company company) {
+        return companyService.updateCompanyProfile(company);
     }
 
     @ExceptionHandler
@@ -81,6 +89,7 @@ public class CompanyController {
         error.setTimeStamp(System.currentTimeMillis());
         return new ResponseEntity<>(error, HttpStatus.LENGTH_REQUIRED);
     }
+
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleException(UserNotFoundException exc) {
         ExceptionResponse error = new ExceptionResponse();
@@ -88,6 +97,6 @@ public class CompanyController {
         error.setMessage(exc.getMessage());
         error.setTimeStamp(System.currentTimeMillis());
         return new ResponseEntity<>(error, HttpStatus.LENGTH_REQUIRED);
-    }
 
+    }
 }

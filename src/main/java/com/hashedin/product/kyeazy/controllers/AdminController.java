@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -33,28 +34,28 @@ public class AdminController {
         return null;
     }
 
-    @RequestMapping("/view-all-applications/{companyId}")
-    public Set<Employee> viewAllApplications(@PathVariable Integer companyId)
+    @RequestMapping("/view-all-applications")
+    public List<Employee> viewAllApplications()
     {
-        return adminService.viewAllApplications(companyId);
+        return adminService.viewAllApplications();
     }
 
-    @RequestMapping("/view-pending-applications/{companyId}")
-    public Set<Employee> viewPendingApplications(@PathVariable Integer companyId)
+    @RequestMapping("/view-pending-applications")
+    public List<Employee> viewPendingApplications()
     {
-        return adminService.viewPendingApplications(companyId);
+        return adminService.viewPendingApplications();
     }
 
-    @RequestMapping("/view-accepted-applications/{companyId}")
-    public Set<Employee> viewAcceptedApplications(@PathVariable Integer companyId)
+    @RequestMapping("/view-accepted-applications")
+    public List<Employee> viewAcceptedApplications()
     {
-        return adminService.viewAcceptedApplications(companyId);
+        return adminService.viewAcceptedApplications();
     }
 
-    @RequestMapping("/view-rejected-applications/{companyId}")
-    public Set<Employee> viewRejectedApplications(@PathVariable Integer companyId)
+    @RequestMapping("/view-rejected-applications")
+    public List<Employee> viewRejectedApplications()
     {
-        return adminService.viewRejectedApplications(companyId);
+        return adminService.viewRejectedApplications();
     }
     @RequestMapping("/viewEmployeeDetails")
     public ActionDTO viewEmployeeDetails()

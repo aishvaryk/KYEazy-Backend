@@ -93,10 +93,6 @@ public class CompanyService {
             throw new RequiredFieldException("Company name can't be empty.");
         }
 
-        company.setCompanyDescription(companyDetails.getCompanyDescription());
-        company.setEmployees(company.getEmployees());
-        company.setName(companyDetails.getName());
-        company.setAddress(companyDetails.getAddress());
         Company companyUpdated= companyRepository.save(company);
         return new ActionDTO(companyUpdated.getCompanyId(), true, "Company details Updated");
     }
@@ -135,8 +131,66 @@ public class CompanyService {
         return password;
 
     }
-
+    public ActionDTO getCompanyDetails(Integer id)
+    {
+        Company company=companyRepository.findById(id).get();
+        return new ActionDTO();
     }
+    public List<Employee> getEmployeeByName(Integer companyId,String name)
+    {   Company company=companyRepository.findById(companyId).get();
+        Set<Employee> employeeList=company.getEmployees();
+        List<Employee> employees=null;
+        for(Employee e:employeeList){
+            if(e.getFirstName().equals(name))
+                employees.add(e);
+        }
+        return  employees;
+    }
+
+    public List<Employee> getEmployeesSortedByName()
+    {
+        List<Employee> employee=employeeRepository.findAll();
+        employee.sort(new ComparatorService());
+        return  employee;
+    }
+
+    public List<Employee> getEmployeesWithPendingKYC(Integer id)
+    {
+        Company company=companyRepository.findById(id).get();
+        Set<Employee> employee=company.getEmployees();
+        List<Employee> pendingEmployees = null;
+        for(Employee e:employee){
+            if(e.getStatus().equals("pending"))
+                pendingEmployees.add(e);
+        }
+        return pendingEmployees;
+    }
+    public List<Employee> getEmployeesWithRejectedKYC(Integer id)
+    {
+        Company company=companyRepository.findById(id).get();
+        Set<Employee> employee=company.getEmployees();
+        List<Employee> rejectedEmployees = null;
+        for(Employee e:employee){
+            if(e.getStatus().equals("rejected"))
+                rejectedEmployees.add(e);
+        }
+        return rejectedEmployees;
+    }
+
+    public List<Employee> getEmployeesByDateOfApplication(Date date)
+    {
+        List<Employee> employeeList=employeeRepository.findAll();
+        List<Employee> employees=null;
+        for(Employee e:employeeList){
+            if(e.getDateTimeOfVerification().equals(date))
+                employees.add(e);
+        }
+        return  employees;
+    }
+
+
+}
+
 
 
 

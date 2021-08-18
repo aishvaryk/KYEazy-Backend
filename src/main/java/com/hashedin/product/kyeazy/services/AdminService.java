@@ -5,7 +5,10 @@ import com.hashedin.product.kyeazy.repositories.CompanyRepository;
 import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 import java.util.Set;
+
 
 @Service
 public class AdminService {
@@ -14,43 +17,44 @@ public class AdminService {
     @Autowired
     CompanyRepository companyRepo;
 
-    public Set<Employee> viewAllApplications(Integer id)
+    public List<Employee> viewAllApplications()
     {
-        Company company= companyRepo.getById(id);
-        Set<Employee> employee=company.getEmployees();
+        List<Employee> employee=employeeRepository.findAll();
         return employee;
     }
-    public Set<Employee> viewPendingApplications(Integer id)
+    public List<Employee> viewPendingApplications()
     {
-        Company company= companyRepo.getById(id);
-        Set<Employee> employee=company.getEmployees();
-        Set<Employee> pendingApplications = null;
+        List<Employee> employee=employeeRepository.findAll();
+        List<Employee> pendingApplications = null;
         for(Employee e:employee){
             if(e.getStatus().equals("pending"))
                 pendingApplications.add(e);
         }
         return pendingApplications;
     }
-    public Set<Employee> viewAcceptedApplications(Integer id)
+    public List<Employee> viewAcceptedApplications()
     {
-        Company company= companyRepo.getById(id);
-        Set<Employee> employee=company.getEmployees();
-        Set<Employee> acceptedApplications = null;
+        List<Employee> employee=employeeRepository.findAll();
+        List<Employee> acceptedApplications = null;
         for(Employee e:employee){
             if(e.getStatus().equals("accepted"))
                 acceptedApplications.add(e);
         }
         return acceptedApplications;
     }
-    public Set<Employee> viewRejectedApplications(Integer id)
+    public List<Employee> viewRejectedApplications()
     {
-        Company company= companyRepo.getById(id);
-        Set<Employee> employee=company.getEmployees();
-        Set<Employee> rejectedApplications = null;
+        List<Employee> employee=employeeRepository.findAll();
+        List<Employee> rejectedApplications = null;
         for(Employee e:employee){
             if(e.getStatus().equals("rejected"))
                 rejectedApplications.add(e);
         }
         return rejectedApplications;
+    }
+    public void verify(String status,Integer id){
+        Employee employee=employeeRepository.findById(id).get();
+        employee.setStatus(status);
+        employeeRepository.save(employee);
     }
 }
