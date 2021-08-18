@@ -55,4 +55,9 @@ public class AdminService {
         }
         return rejectedApplications;
     }
+    public void verify(String status,Integer id){
+        Employee employee=employeeRepository.findById(id).get();
+        employee.setStatus(status);
+        employeeRepository.save(employee);
+    }
 }
