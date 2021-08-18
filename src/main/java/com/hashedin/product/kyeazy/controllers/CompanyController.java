@@ -1,12 +1,18 @@
 package com.hashedin.product.kyeazy.controllers;
 
 import com.hashedin.product.kyeazy.dto.ActionDTO;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import com.hashedin.product.kyeazy.entities.Company;
+import com.hashedin.product.kyeazy.services.CompanyService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import javax.persistence.criteria.CriteriaBuilder;
 
 @RestController
 @RequestMapping("/company")
 public class CompanyController {
+    @Autowired
+    CompanyService companyService;
 
     @RequestMapping("/login")
     public ActionDTO login()
@@ -44,16 +50,35 @@ public class CompanyController {
         return null;
     }
 
+    @GetMapping("/get-company-details")
+    public ActionDTO getCompanyDetails()
+    {
+        return null;
+    }
+
+    @GetMapping("/get-employees-sortedbyname")
+    public ActionDTO getEmployeesSortedByName()
+    {
+        return null;
+    }
+
+    @RequestMapping("/get-employees-byname")
+    public ActionDTO getEmployeeByName()
+    {
+        return null;
+    }
+
+
     @RequestMapping("/profile")
     public ActionDTO viewProfile()
     {
         return null;
     }
 
-    @RequestMapping("/update-profile")
-    public ActionDTO updateProfile()
+    @PutMapping("/update-profile")
+    public ActionDTO updateProfile(@RequestBody Company company)
     {
-        return null;
+        return companyService.updateProfile(company);
     }
 
 }
