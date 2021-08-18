@@ -1,5 +1,4 @@
 package com.hashedin.product.kyeazy.services;
-import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.repositories.CompanyRepository;
 import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
@@ -7,15 +6,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
-
 
 @Service
 public class AdminService {
     @Autowired
     EmployeeRepository employeeRepository;
     @Autowired
-    CompanyRepository companyRepo;
+    CompanyRepository companyRepository;
+
+    public Employee viewEmployeeApplication(Integer employeeId)
+    {
+        Employee employee=employeeRepository.findById(employeeId).get();
+        return employee;
+    }
 
     public List<Employee> viewAllApplications()
     {

@@ -1,6 +1,7 @@
 package com.hashedin.product.kyeazy.controllers;
 
 import com.hashedin.product.kyeazy.dto.ActionDTO;
+import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.exceptions.RequiredFieldException;
@@ -11,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -45,7 +48,7 @@ public class CompanyController {
     }
 
     @GetMapping("/employees/{companyId}")
-    public Set<Employee> getEmployees(@PathVariable Integer companyId) {
+    public Set<EmployeeDTO> getEmployees(@PathVariable Integer companyId) {
         return companyService.getEmployees(companyId);
     }
 
@@ -65,9 +68,9 @@ public class CompanyController {
         return null;
     }
 
-    @RequestMapping("/get-employees-by-name")
-    public ActionDTO getEmployeeByName() {
-        return null;
+    @GetMapping("/get-employees-by-name/{id}/{name}")
+    public List<Employee> getEmployeeByName(@PathVariable Integer id, @PathVariable String name) {
+        return companyService.getEmployeeByName(id,name);
     }
 
 

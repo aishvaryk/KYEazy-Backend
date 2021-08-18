@@ -57,9 +57,12 @@ public class AdminController {
     {
         return adminService.viewRejectedApplications();
     }
-    @RequestMapping("/viewEmployeeDetails")
+
+    @RequestMapping("/viewEmployeeDetails/{}")
     public ActionDTO viewEmployeeDetails()
     {
+        Employee employee =new Employee();
+      // adminService.viewEmployeeApplication(employeeId);
         return null;
     }
 

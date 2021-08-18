@@ -1,5 +1,6 @@
 package com.hashedin.product.kyeazy.services;
 import com.hashedin.product.kyeazy.dto.ActionDTO;
+import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.exceptions.RequiredFieldException;
@@ -7,6 +8,8 @@ import com.hashedin.product.kyeazy.repositories.CompanyRepository;
 import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -70,12 +73,40 @@ public class CompanyService {
         Employee addedEmployee = employeeRepository.save(employee);
         return new ActionDTO(addedEmployee.getEmployeeId(), true, "Employee KYC Under Progress Wait for 2-3 days");
     }
-
-    public Set<Employee> getEmployees(Integer id)
+@Transactional
+    public Set<EmployeeDTO> getEmployees(Integer id)
     {
         Company company= companyRepository.getById(id);
-        return company.getEmployees();
+
+        Set<EmployeeDTO> employeeDTOS=new HashSet<>();
+        for(Employee employee:company.getEmployees())
+        {
+            employeeDTOS.add(parseEmployee(employee));
+        }
+
+        return  employeeDTOS;
     }
+
+    private EmployeeDTO parseEmployee(Employee employee)
+    {
+        EmployeeDTO employeeDTO=new EmployeeDTO();
+        employeeDTO.setAddress(employee.getAddress());
+        employeeDTO.setEmployeeId(employee.getEmployeeId());
+        employeeDTO.setFirstName(employee.getFirstName());
+        employeeDTO.setLastName(employee.getLastName());
+        employeeDTO.setContactNumber(employee.getContactNumber());
+        employeeDTO.setEmailID(employee.getEmailID());
+        employeeDTO.setDateTimeOfApplication(employee.getDateTimeOfApplication());
+        employeeDTO.setDateTimeOfVerification(employee.getDateTimeOfVerification());
+        employeeDTO.setDocumentNumber(employee.getDocumentNumber());
+        employeeDTO.setCompanyId(employee.getCompanyId());
+        employeeDTO.setDocumentType(employee.getDocumentType());
+
+      //  employeeDTO.setCapturedImage(employee.getCapturedImage());
+        return  employeeDTO;
+    }
+
+    @Transactional
     public Set<Employee> getEmployeesByStatus(Integer companyId,String status){
         Company company= companyRepository.getById(companyId);
         return company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase(status);}).collect(Collectors.toSet());
@@ -136,24 +167,25 @@ public class CompanyService {
         Company company=companyRepository.findById(id).get();
         return new ActionDTO();
     }
+    @Transactional
     public List<Employee> getEmployeeByName(Integer companyId,String name)
-    {   Company company=companyRepository.findById(companyId).get();
+    {
+        Company company=companyRepository.findById(companyId).get();
         Set<Employee> employeeList=company.getEmployees();
-        List<Employee> employees=null;
+        List<Employee> employees=new LinkedList<>();
         for(Employee e:employeeList){
-            if(e.getFirstName().equals(name))
-                employees.add(e);
+            if(e.getFirstName().equals(name)) employees.add(e);
         }
         return  employees;
     }
-
+    @Transactional
     public List<Employee> getEmployeesSortedByName()
     {
         List<Employee> employee=employeeRepository.findAll();
         employee.sort(new ComparatorService());
         return  employee;
     }
-
+    @Transactional
     public List<Employee> getEmployeesWithPendingKYC(Integer id)
     {
         Company company=companyRepository.findById(id).get();
@@ -165,6 +197,7 @@ public class CompanyService {
         }
         return pendingEmployees;
     }
+    @Transactional
     public List<Employee> getEmployeesWithRejectedKYC(Integer id)
     {
         Company company=companyRepository.findById(id).get();
@@ -176,7 +209,7 @@ public class CompanyService {
         }
         return rejectedEmployees;
     }
-
+    @Transactional
     public List<Employee> getEmployeesByDateOfApplication(Date date)
     {
         List<Employee> employeeList=employeeRepository.findAll();
