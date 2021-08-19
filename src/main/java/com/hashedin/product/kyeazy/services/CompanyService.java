@@ -3,6 +3,7 @@ import com.hashedin.product.kyeazy.dto.ActionDTO;
 import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
+import com.hashedin.product.kyeazy.exceptions.DataNotFoundException;
 import com.hashedin.product.kyeazy.exceptions.RequiredFieldException;
 import com.hashedin.product.kyeazy.repositories.CompanyRepository;
 import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
@@ -29,6 +30,13 @@ public class CompanyService {
     public ActionDTO register(Company company) {
 
         //company uniqueness check
+
+        List<Company> companies=companyRepository.findAll();
+        for(Company companyToCheck:companies)
+        {
+            if(companyToCheck.getUsername().equals(company.getUsername()))throw new DataNotFoundException("The Username is already registered !!!!!");
+            if(companyToCheck.getCinNumber().equalsIgnoreCase(company.getCinNumber()))throw new DataNotFoundException("The Company is already registered !!!!!");
+        }
         if (company.getName() == null || company.getName().length() == 0) {
             throw new RequiredFieldException("Company name can't be empty.");
         }
@@ -42,20 +50,12 @@ public class CompanyService {
 
     public ActionDTO registerEmployee(Employee employee,int companyId) {
 
-        //find By Email Verification
-        if (employee.getContactNumber() == null || employee.getContactNumber().length() == 0) {
-            throw new RequiredFieldException("Please enter contact Number.");
-        }
-        if (employee.getEmailID() == null || employee.getEmailID().length() == 0) {
-            throw new RequiredFieldException("Please Enter email Id.");
-        }
-        if (employee.getFirstName() == null || employee.getFirstName().length() == 0) {
-            throw new RequiredFieldException("Please Enter employee first name");
+        List<Employee> employees=employeeRepository.findAll();
+        for(Employee employeeToCheck:employees)
+        {
+            if(employeeToCheck.getEmailID().equals(employee.getEmailID()) && employeeToCheck.getCompanyId()==companyId)throw new DataNotFoundException("The given is already registered with same company !!!!!");
         }
 
-        if (employee.getLastName() == null || employee.getLastName().length() == 0) {
-            throw new RequiredFieldException("Please Enter employee Last name");
-        }
         String username = this.generateUsername(employee);
         String passkey = String.valueOf(this.generatePassword(employee));
 
@@ -117,39 +117,6 @@ public class CompanyService {
     }
 
 
-    private String generateUsername(Employee employee) {
-        String username="";
-        UUID uuid = UUID.randomUUID();
-        String uuidAsString = uuid.toString();
-        username+=employee.getFirstName().substring(0,1);
-        username+=employee.getLastName();
-        username+=uuidAsString.substring(0,3);
-        return username;
-    }
-
-    private static char[] generatePassword(Employee employee)
-    {
-        String name=employee.getFirstName();
-
-        String capitalCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
-        String specialCharacters = "!@#$_";
-        String numbers = "1234567890";
-        String combinedChars = capitalCaseLetters + lowerCaseLetters + specialCharacters + numbers;
-        Random random = new Random();
-        char[] password = new char[7];
-        password[0] = name.toUpperCase().charAt(0);
-        password[1] = name.toLowerCase().charAt(1);
-        password[2] = name.toLowerCase().charAt(2);
-        password[3] = numbers.charAt(random.nextInt(numbers.length()));
-        password[4] = specialCharacters.charAt(random.nextInt(specialCharacters.length()));
-
-        for(int i = 5; i< 7 ; i++) {
-            password[i] = combinedChars.charAt(random.nextInt(combinedChars.length()));
-        }
-        return password;
-
-    }
     public Company getCompanyDetails(Integer id)
     {
         Company company=companyRepository.findById(id).get();
@@ -182,9 +149,9 @@ public class CompanyService {
         Company company=companyRepository.findById(id).get();
         Set<Employee> employee=company.getEmployees();
         Set<Employee> pendingEmployees =company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Pending");}).collect(Collectors.toSet());
-        for(Employee e:pendingEmployees)
+        for(Employee pendingEmployee:pendingEmployees)
         {
-            employeeDTOS.add(parseEmployee(e));
+            employeeDTOS.add(parseEmployee(pendingEmployee));
         }
         return employeeDTOS;
     }
@@ -236,44 +203,41 @@ public class CompanyService {
         employeeDTO.setDocumentNumber(employee.getDocumentNumber());
         employeeDTO.setCompanyId(employee.getCompanyId());
         employeeDTO.setDocumentType(employee.getDocumentType());
-
-        //  employeeDTO.setCapturedImage(employee.getCapturedImage());
         return  employeeDTO;
     }
-//
-//    private String generateUsername(Employee employee) {
-//        String username="";
-//        UUID uuid = UUID.randomUUID();
-//        String uuidAsString = uuid.toString();
-//        username+=employee.getFirstName().substring(0,1);
-//        username+=employee.getLastName();
-//        username+=uuidAsString.substring(0,3);
-//        return username;
-//    }
-//
-//    private static char[] generatePassword(Employee employee)
-//    {
-//        String name=employee.getFirstName();
-//
-//        String capitalCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-//        String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
-//        String specialCharacters = "!@#$_";
-//        String numbers = "1234567890";
-//        String combinedChars = capitalCaseLetters + lowerCaseLetters + specialCharacters + numbers;
-//        Random random = new Random();
-//        char[] password = new char[7];
-//        password[0] = name.toUpperCase().charAt(0);
-//        password[1] = name.toLowerCase().charAt(1);
-//        password[2] = name.toLowerCase().charAt(2);
-//        password[3] = numbers.charAt(random.nextInt(numbers.length()));
-//        password[4] = specialCharacters.charAt(random.nextInt(specialCharacters.length()));
-//
-//        for(int i = 5; i< 7 ; i++) {
-//            password[i] = combinedChars.charAt(random.nextInt(combinedChars.length()));
-//        }
-//        return password;
-//
-//    }
+    private String generateUsername(Employee employee) {
+        String username="";
+        UUID uuid = UUID.randomUUID();
+        String uuidAsString = uuid.toString();
+        username+=employee.getFirstName().substring(0,1);
+        username+=employee.getLastName();
+        username+=uuidAsString.substring(0,3);
+        return username;
+    }
+
+    private static char[] generatePassword(Employee employee)
+    {
+        String name=employee.getFirstName();
+
+        String capitalCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
+        String specialCharacters = "!@#$_";
+        String numbers = "1234567890";
+        String combinedChars = capitalCaseLetters + lowerCaseLetters + specialCharacters + numbers;
+        Random random = new Random();
+        char[] password = new char[7];
+        password[0] = name.toUpperCase().charAt(0);
+        password[1] = name.toLowerCase().charAt(1);
+        password[2] = name.toLowerCase().charAt(2);
+        password[3] = numbers.charAt(random.nextInt(numbers.length()));
+        password[4] = specialCharacters.charAt(random.nextInt(specialCharacters.length()));
+
+        for(int i = 5; i< 7 ; i++) {
+            password[i] = combinedChars.charAt(random.nextInt(combinedChars.length()));
+        }
+        return password;
+
+    }
 
 
 }

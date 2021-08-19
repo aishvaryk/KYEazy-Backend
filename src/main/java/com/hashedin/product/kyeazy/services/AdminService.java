@@ -16,8 +16,7 @@ public class AdminService {
 
     public Employee viewEmployeeApplication(Integer employeeId)
     {
-        Employee employee=employeeRepository.findById(employeeId).get();
-        return employee;
+     return employeeRepository.findById(employeeId).get();
     }
 
     public List<Employee> viewAllApplications()
@@ -40,7 +39,7 @@ public class AdminService {
         List<Employee> employee=employeeRepository.findAll();
         List<Employee> acceptedApplications = null;
         for(Employee e:employee){
-            if(e.getStatus().equals("accepted"))
+            if(e.getStatus().equalsIgnoreCase("accepted"))
                 acceptedApplications.add(e);
         }
         return acceptedApplications;
@@ -50,20 +49,24 @@ public class AdminService {
         List<Employee> employee=employeeRepository.findAll();
         List<Employee> rejectedApplications = null;
         for(Employee e:employee){
-            if(e.getStatus().equals("rejected"))
+            if(e.getStatus().equalsIgnoreCase("rejected"))
                 rejectedApplications.add(e);
         }
         return rejectedApplications;
     }
     public void verify(String status,Integer id){
-        Employee employee=employeeRepository.findById(id).get();
+        Employee employee=getEmployeeById(id);
         employee.setStatus(status);
         employeeRepository.save(employee);
     }
     public byte[] getEmployeeImage(Integer employeeId) {
-        Employee employee=employeeRepository.findById(employeeId).get();
+        Employee employee=getEmployeeById(employeeId);
         byte[] profilePictureBytes = employee.getCapturedImage();
         return profilePictureBytes;
+    }
+    public Employee getEmployeeById(Integer employeeId)
+    {
+        return employeeRepository.findById(employeeId).get();
     }
 
 }

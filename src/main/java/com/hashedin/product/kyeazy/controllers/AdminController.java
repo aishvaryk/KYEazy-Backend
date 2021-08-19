@@ -66,6 +66,7 @@ public class AdminController {
       // adminService.viewEmployeeApplication(employeeId);
         return null;
     }
+
     @GetMapping(value="/{id}/profile-picture")
     public byte[] getEmployeeImage(@PathVariable Integer employeeId) throws IOException {
         return adminService.getEmployeeImage(employeeId);
@@ -76,5 +77,6 @@ public class AdminController {
     {
         return null;
     }
+
 
 }

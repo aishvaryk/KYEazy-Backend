@@ -29,7 +29,7 @@ public class Company {
     private String companyDescription;
 
     @Column(name="cin_number")
-    private String CINNumber;
+    private String cinNumber;
 
     @OneToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="addressId")

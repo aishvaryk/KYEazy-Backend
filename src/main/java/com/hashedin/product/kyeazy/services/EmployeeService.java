@@ -2,15 +2,11 @@ package com.hashedin.product.kyeazy.services;
 
 import com.hashedin.product.kyeazy.dto.ActionDTO;
 import com.hashedin.product.kyeazy.entities.Employee;
-import com.hashedin.product.kyeazy.exceptions.RequiredFieldException;
 import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import javax.transaction.Transactional;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -26,7 +22,7 @@ public class EmployeeService {
 
     public ActionDTO updateProfileData(Employee employeeDetails)
     {
-        Employee employee=employeeRepository.findById(employeeDetails.getEmployeeId()).get();
+        Employee employee=this.getEmployeeData(employeeDetails.getEmployeeId());
         employee.setDocumentNumber(employeeDetails.getDocumentNumber());
         employee.setDocumentType(employeeDetails.getDocumentType());
         employee.setAddress(employeeDetails.getAddress());
@@ -35,7 +31,7 @@ public class EmployeeService {
     }
     public ActionDTO updateEmployeeImage(Integer employeeId, MultipartFile profilePicture) throws IOException
     {
-        Employee employee=employeeRepository.findById(employeeId).get();
+        Employee employee=this.getEmployeeData(employeeId);
         employee.setCapturedImage(profilePicture.getBytes());
         Employee savedEmployee = employeeRepository.save(employee);
         return new ActionDTO(savedEmployee.getEmployeeId(),true,"Employee Details Added Successfully.");
@@ -44,7 +40,7 @@ public class EmployeeService {
     public ActionDTO updateEmployeeVideo(Integer employeeId, MultipartFile profileVideo) throws IOException
     {
        // System.out.println("Current folder: " + (new File(".")).getCanonicalPath());
-        Employee employee=employeeRepository.findById(employeeId).get();
+        Employee employee=this.getEmployeeData(employeeId);
         String uploadDir="src/main/resources/employee_videos";
         Path uploadPath = Paths.get(uploadDir);
 

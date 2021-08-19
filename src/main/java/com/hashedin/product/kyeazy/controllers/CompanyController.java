@@ -4,8 +4,8 @@ import com.hashedin.product.kyeazy.dto.ActionDTO;
 import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
+import com.hashedin.product.kyeazy.exceptions.DataNotFoundException;
 import com.hashedin.product.kyeazy.exceptions.RequiredFieldException;
-import com.hashedin.product.kyeazy.exceptions.UserNotFoundException;
 import com.hashedin.product.kyeazy.exceptions.response.ExceptionResponse;
 import com.hashedin.product.kyeazy.services.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,7 +110,7 @@ public class CompanyController {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ExceptionResponse> handleException(UserNotFoundException exc) {
+    public ResponseEntity<ExceptionResponse> handleException(DataNotFoundException exc) {
         ExceptionResponse error = new ExceptionResponse();
         error.setStatus(HttpStatus.LENGTH_REQUIRED.value());
         error.setMessage(exc.getMessage());
