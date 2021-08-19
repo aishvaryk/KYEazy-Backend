@@ -1,6 +1,7 @@
 package com.hashedin.product.kyeazy.controllers;
 
 import com.hashedin.product.kyeazy.dto.ActionDTO;
+import com.hashedin.product.kyeazy.dto.CompanyDTO;
 import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
@@ -58,7 +59,7 @@ public class CompanyController {
     }
 
     @GetMapping("/get-company-details/{id}")
-    public Company getCompanyDetails(@PathVariable Integer id) {
+    public CompanyDTO getCompanyDetails(@PathVariable Integer id) {
         return companyService.getCompanyDetails(id);
     }
 
@@ -76,6 +77,11 @@ public class CompanyController {
     @GetMapping ("/get-employees-with-pending-kyc/{id}")
     public Set<EmployeeDTO> getEmployeesWithPendingKYC(@PathVariable Integer id){
         return companyService.getEmployeesWithPendingKYC(id);
+    }
+
+    @GetMapping ("/get-registered-employee/{id}")
+    public Set<EmployeeDTO> getRegisteredEmployee(@PathVariable Integer id){
+        return companyService.getRegisteredEmployees(id);
     }
 
     @GetMapping ("/get-employees-with-rejected-kyc/{id}")

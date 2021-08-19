@@ -1,5 +1,6 @@
 package com.hashedin.product.kyeazy.services;
 import com.hashedin.product.kyeazy.dto.ActionDTO;
+import com.hashedin.product.kyeazy.dto.CompanyDTO;
 import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
@@ -66,16 +67,16 @@ public class CompanyService {
         employee.setUsername(username);
         employee.setPassword(passkey);
 
-        employee.setStatus("Pending");
+        employee.setStatus("Registered");
         employee.setDateTimeOfApplication(new Date());
         employee.setCompanyId(companyId);
         Employee addedEmployee = employeeRepository.save(employee);
         return new ActionDTO(addedEmployee.getEmployeeId(), true, "Employee KYC Under Progress Wait for 2-3 days");
     }
-@Transactional
+    @Transactional
     public Set<EmployeeDTO> getEmployees(Integer id)
     {
-        Company company= companyRepository.getById(id);
+        Company company= getCompanyById(id);
 
         Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         for(Employee employee:company.getEmployees())
@@ -90,7 +91,7 @@ public class CompanyService {
     @Transactional
     public Set<EmployeeDTO> getEmployeesByStatus(Integer companyId, String status){
         Set<EmployeeDTO> employeeDTOS=new HashSet<>();
-        Company company= companyRepository.getById(companyId);
+        Company company= getCompanyById(companyId);
         Set<Employee> employeesbyStatus=company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase(status);}).collect(Collectors.toSet());
         for(Employee e:employeesbyStatus)
         {
@@ -117,20 +118,22 @@ public class CompanyService {
     }
 
 
-    public Company getCompanyDetails(Integer id)
+    public CompanyDTO getCompanyDetails(Integer id)
     {
-        Company company=companyRepository.findById(id).get();
-        return company;
+        Company company=getCompanyById(id);
+        return parseCompany(company);
     }
+    @Transactional
     public EmployeeDTO getEmployeeByName(Integer companyId,String name) {
-        Company company = companyRepository.findById(companyId).get();
+        Company company = getCompanyById(companyId);
         Set<Employee> employeeList = company.getEmployees();
         Employee employeebyname= employeeList.stream()
-                .filter(employee -> name.equals(employee.getFirstName() + employee.getLastName()))
+                .filter(employee -> name.equalsIgnoreCase(employee.getFirstName() + employee.getLastName()))
                 .findAny()
                 .orElse(null);
         return parseEmployee(employeebyname);
     }
+    @Transactional
     public Set<EmployeeDTO> getEmployeesSortedByName()
     {
         Set<EmployeeDTO> employeeDTOS=new HashSet<>();
@@ -144,9 +147,22 @@ public class CompanyService {
     }
 
     @Transactional
+    public Set<EmployeeDTO> getRegisteredEmployees(Integer id)
+    {   Set<EmployeeDTO> employeeDTOS=new HashSet<>();
+        Company company=getCompanyById(id);
+        Set<Employee> employee=company.getEmployees();
+        Set<Employee> registeredEmployees =company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Registered");}).collect(Collectors.toSet());
+        for(Employee e:registeredEmployees)
+        {
+            employeeDTOS.add(parseEmployee(e));
+        }
+        return employeeDTOS;
+    }
+
+    @Transactional
     public Set<EmployeeDTO> getEmployeesWithPendingKYC(Integer id)
     {   Set<EmployeeDTO> employeeDTOS=new HashSet<>();
-        Company company=companyRepository.findById(id).get();
+        Company company=getCompanyById(id);
         Set<Employee> employee=company.getEmployees();
         Set<Employee> pendingEmployees =company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Pending");}).collect(Collectors.toSet());
         for(Employee pendingEmployee:pendingEmployees)
@@ -159,7 +175,7 @@ public class CompanyService {
     public Set<EmployeeDTO> getEmployeesWithRejectedKYC(Integer id)
     {
         Set<EmployeeDTO> employeeDTOS=new HashSet<>();
-        Company company=companyRepository.findById(id).get();
+        Company company=getCompanyById(id);
         Set<Employee> employee=company.getEmployees();
         Set<Employee> rejectedEmployees = company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Rejected");}).collect(Collectors.toSet());
         for(Employee e:rejectedEmployees)
@@ -176,17 +192,22 @@ public class CompanyService {
         List<Employee> employees=new LinkedList<>();
         for(Employee e:employeeList){
             String s=e.getDateTimeOfApplication().toString();
-            if(s.equals(date))
+            if(s.equalsIgnoreCase(date))
             {
                 employees.add(e);
             }
 
         }
-        for(Employee e:employees)
+        for(Employee employee:employees)
         {
-            employeeDTOS.add(parseEmployee(e));
+            employeeDTOS.add(parseEmployee(employee));
         }
         return employeeDTOS;
+    }
+    @Transactional
+    private Company getCompanyById(Integer companyId)
+    {
+        return companyRepository.findById(companyId).get();
     }
     private EmployeeDTO parseEmployee(Employee employee)
     {
@@ -237,6 +258,19 @@ public class CompanyService {
         }
         return password;
 
+    }
+
+    private CompanyDTO parseCompany(Company company)
+    {
+        CompanyDTO companyDTO=new CompanyDTO();
+        companyDTO.setEmployees(company.getEmployees());
+        companyDTO.setCompanyId(company.getCompanyId());
+        companyDTO.setCompanyDescription(company.getCompanyDescription());
+        companyDTO.setName(company.getName());
+        companyDTO.setCINNumber(company.getCinNumber());
+        companyDTO.setUsername(company.getUsername());
+        companyDTO.setAddress(companyDTO.getAddress());
+        return  companyDTO;
     }
 
 

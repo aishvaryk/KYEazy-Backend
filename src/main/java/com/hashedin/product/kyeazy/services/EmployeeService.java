@@ -26,6 +26,7 @@ public class EmployeeService {
         employee.setDocumentNumber(employeeDetails.getDocumentNumber());
         employee.setDocumentType(employeeDetails.getDocumentType());
         employee.setAddress(employeeDetails.getAddress());
+        employee.setStatus("Pending");
         Employee savedEmployee = employeeRepository.save(employee);
         return new ActionDTO(savedEmployee.getEmployeeId(),true,"Employee Details Added Successfully.");
     }

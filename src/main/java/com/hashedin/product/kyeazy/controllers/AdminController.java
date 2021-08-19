@@ -1,6 +1,7 @@
 package com.hashedin.product.kyeazy.controllers;
 
 import com.hashedin.product.kyeazy.dto.ActionDTO;
+import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.services.AdminService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/admin")
@@ -36,35 +38,33 @@ public class AdminController {
     }
 
     @RequestMapping("/view-all-applications")
-    public List<Employee> viewAllApplications()
+    public List<EmployeeDTO> viewAllApplications()
     {
         return adminService.viewAllApplications();
     }
 
     @RequestMapping("/view-pending-applications")
-    public List<Employee> viewPendingApplications()
+    public Set<EmployeeDTO> viewPendingApplications()
     {
         return adminService.viewPendingApplications();
     }
 
     @RequestMapping("/view-accepted-applications")
-    public List<Employee> viewAcceptedApplications()
+    public Set<EmployeeDTO> viewAcceptedApplications()
     {
         return adminService.viewAcceptedApplications();
     }
 
     @RequestMapping("/view-rejected-applications")
-    public List<Employee> viewRejectedApplications()
+    public Set<EmployeeDTO> viewRejectedApplications()
     {
         return adminService.viewRejectedApplications();
     }
 
-    @RequestMapping("/viewEmployeeDetails/{}")
-    public ActionDTO viewEmployeeDetails()
+    @RequestMapping("/viewEmployeeDetails/{id}")
+    public EmployeeDTO viewEmployeeDetails(@PathVariable Integer id)
     {
-        Employee employee =new Employee();
-      // adminService.viewEmployeeApplication(employeeId);
-        return null;
+        return adminService.viewEmployeeApplication(id);
     }
 
     @GetMapping(value="/{id}/profile-picture")
@@ -72,10 +72,11 @@ public class AdminController {
         return adminService.getEmployeeImage(employeeId);
     }
 
-    @RequestMapping("/verify")
-    public ActionDTO verify()
+
+    @RequestMapping("/verify/{id}/{status}")
+    public EmployeeDTO verify(@PathVariable Integer id,@PathVariable String status)
     {
-        return null;
+        return adminService.verify(status,id);
     }
 
 
