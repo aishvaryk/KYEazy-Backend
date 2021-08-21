@@ -6,6 +6,7 @@ import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,54 +24,63 @@ public class AdminService {
         Employee employee=getEmployeeById(employeeId);
         return parseEmployee(employee);
     }
-
-    public List<EmployeeDTO> viewAllApplications()
+    @Transactional
+    public List<EmployeeDTO> viewAllApplications(Integer pageNumber,Integer pageSize)
     {
         List<Employee> employees=employeeRepository.findAll();
+
         List<EmployeeDTO> employeeDTOS=new LinkedList<>();
+        Set<Employee> employeeList=new HashSet<>();
         for(Employee employee:employees)
+        {
+            employeeList.add(employee);
+        }
+        for(Employee employee:this.getEmployeePagination(pageNumber,pageSize,employeeList))
         {
             EmployeeDTO employeeDTO=parseEmployee(employee);
             employeeDTOS.add(employeeDTO);
         }
         return employeeDTOS;
     }
-    public Set<EmployeeDTO> viewPendingApplications()
+    @Transactional
+    public Set<EmployeeDTO> viewPendingApplications(Integer pageNumber,Integer pageSize)
     {
         Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         List<Employee> employee=employeeRepository.findAll();
         Set<Employee> pendingApplications = employee.stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Pending");}).collect(Collectors.toSet());
-        for(Employee e:pendingApplications)
+        for(Employee e:this.getEmployeePagination(pageNumber,pageSize,pendingApplications))
         {
             employeeDTOS.add(parseEmployee(e));
         }
         return employeeDTOS;
     }
 
-
-    public Set<EmployeeDTO> viewAcceptedApplications()
+    @Transactional
+    public Set<EmployeeDTO> viewAcceptedApplications(Integer pageNumber,Integer pageSize)
     {
         Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         List<Employee> employee=employeeRepository.findAll();
 
         Set<Employee> acceptedApplications = employee.stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Accepted");}).collect(Collectors.toSet());
-        for(Employee e:acceptedApplications)
+        for(Employee e:this.getEmployeePagination(pageNumber,pageSize,acceptedApplications))
         {
             employeeDTOS.add(parseEmployee(e));
         }
         return employeeDTOS;
     }
-    public Set<EmployeeDTO> viewRejectedApplications()
+    @Transactional
+    public Set<EmployeeDTO> viewRejectedApplications(Integer pageNumber,Integer pageSize)
     {   Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         List<Employee> employee=employeeRepository.findAll();
 
         Set<Employee> rejectedApplications = employee.stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Rejected");}).collect(Collectors.toSet());
-        for(Employee e:rejectedApplications)
+        for(Employee e:this.getEmployeePagination(pageNumber,pageSize,rejectedApplications))
         {
             employeeDTOS.add(parseEmployee(e));
         }
         return employeeDTOS;
     }
+
     public EmployeeDTO verify(String status,Integer id){
         Employee employee=getEmployeeById(id);
         employee.setStatus(status);
@@ -105,9 +115,25 @@ public class AdminService {
         employeeDTO.setCompanyId(employee.getCompanyId());
         employeeDTO.setDocumentType(employee.getDocumentType());
         employeeDTO.setStatus(employee.getStatus());
-
+        employeeDTO.setCapturedImage(employee.getCapturedImage());
         //  employeeDTO.setCapturedImage(employee.getCapturedImage());
         return  employeeDTO;
     }
+    private List<Employee> getEmployeePagination(Integer pageNumber,Integer pageSize,Set<Employee> employees)
+    {
 
+        Integer lastIndex=employees.size();
+        Integer from=(pageNumber-1)*pageSize;
+        Integer to=from+pageSize;
+        if(from>employees.size()-1) return null;
+        if(to>lastIndex) to=lastIndex;
+        List<Employee> employeeList=new ArrayList<>();
+
+        employees.stream().sorted(Comparator.comparing(Employee::getEmployeeId)).forEach((p)->{
+            employeeList.add(p);
+        });
+
+        return employeeList.subList(from,to);
+
+    }
 }

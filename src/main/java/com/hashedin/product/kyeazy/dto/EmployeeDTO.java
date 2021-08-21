@@ -26,6 +26,6 @@ public class EmployeeDTO {
     private Date dateTimeOfApplication;
     private Address address;
     private  Integer companyId;
-    //private byte[] capturedImage;
+    private byte[] capturedImage;
 
 }

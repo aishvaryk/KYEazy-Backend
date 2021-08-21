@@ -2,6 +2,8 @@ package com.hashedin.product.kyeazy.entities;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.bind.annotation.CrossOrigin;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -9,6 +11,7 @@ import java.util.Date;
 @Table(name="employee")
 @Getter
 @Setter
+
 public class Employee {
 
     @Id

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Set;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/company")
 public class CompanyController {
@@ -47,15 +48,16 @@ public class CompanyController {
         return this.companyService.registerEmployee(employee, companyId);
     }
 
+
     @GetMapping("/employees/{companyId}")
-    public Set<EmployeeDTO> getEmployees(@PathVariable Integer companyId) {
-        return companyService.getEmployees(companyId);
+    public List<EmployeeDTO> getEmployees(@PathVariable Integer companyId,@RequestParam Integer pageNumber,@RequestParam Integer pageSize) {
+        return companyService.getEmployees(companyId,pageNumber,pageSize);
     }
 
     //error
     @GetMapping("/employees-by-status/{companyId}/{status}")
-    public Set<EmployeeDTO> getEmployeesByStatus(@PathVariable Integer companyId, @PathVariable String status) {
-        return companyService.getEmployeesByStatus(companyId, status);
+    public Set<EmployeeDTO> getEmployeesByStatus(@PathVariable Integer companyId, @PathVariable String status,@RequestParam Integer pageNumber,@RequestParam Integer pageSize) {
+        return companyService.getEmployeesByStatus(companyId, status,pageNumber,pageSize);
     }
 
     @GetMapping("/get-company-details/{id}")
@@ -64,8 +66,8 @@ public class CompanyController {
     }
 
     @GetMapping("/get-employees-sorted-by-name")
-    public Set<EmployeeDTO> getEmployeesSortedByName() {
-        return companyService.getEmployeesSortedByName();
+    public Set<EmployeeDTO> getEmployeesSortedByName(@RequestParam Integer pageNumber,@RequestParam Integer pageSize) {
+        return companyService.getEmployeesSortedByName(pageNumber,pageSize);
     }
 
 
@@ -75,25 +77,25 @@ public class CompanyController {
     }
 
     @GetMapping ("/get-employees-with-pending-kyc/{id}")
-    public Set<EmployeeDTO> getEmployeesWithPendingKYC(@PathVariable Integer id){
-        return companyService.getEmployeesWithPendingKYC(id);
+    public Set<EmployeeDTO> getEmployeesWithPendingKYC(@PathVariable Integer id,@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
+        return companyService.getEmployeesWithPendingKYC(id,pageNumber,pageSize);
     }
 
-    @GetMapping ("/get-registered-employee/{id}")
-    public Set<EmployeeDTO> getRegisteredEmployee(@PathVariable Integer id){
-        return companyService.getRegisteredEmployees(id);
+    @GetMapping ("/get-registered-employees/{id}")
+    public Set<EmployeeDTO> getRegisteredEmployees(@PathVariable Integer id,@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
+        return companyService.getRegisteredEmployees(id,pageNumber,pageSize);
     }
 
     @GetMapping ("/get-employees-with-rejected-kyc/{id}")
-    public Set<EmployeeDTO> getEmployeesWithRejectedKYC(@PathVariable Integer id){
-        return companyService.getEmployeesWithRejectedKYC(id);
+    public Set<EmployeeDTO> getEmployeesWithRejectedKYC(@PathVariable Integer id,@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
+        return companyService.getEmployeesWithRejectedKYC(id,pageNumber,pageSize);
     }
 
     @GetMapping ("/get-employees-by-date-of-application/{date}")
-    public Set<EmployeeDTO> getEmployeesByDateOfApplication(@PathVariable String date){
+    public Set<EmployeeDTO> getEmployeesByDateOfApplication(@PathVariable String date,@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
         //Instant timestamp = null;
         //LocalDateTime dateTime = LocalDateTime.parse("2018-05-05T11:50:55");
-        return companyService.getEmployeesByDateOfApplication(date);
+        return companyService.getEmployeesByDateOfApplication(date,pageNumber,pageSize);
     }
 
     @RequestMapping("/profile")

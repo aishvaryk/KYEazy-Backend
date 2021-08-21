@@ -8,6 +8,7 @@ import com.hashedin.product.kyeazy.exceptions.DataNotFoundException;
 import com.hashedin.product.kyeazy.exceptions.RequiredFieldException;
 import com.hashedin.product.kyeazy.repositories.CompanyRepository;
 import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
+import jdk.dynalink.linker.GuardingDynamicLinkerExporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
@@ -74,12 +75,13 @@ public class CompanyService {
         return new ActionDTO(addedEmployee.getEmployeeId(), true, "Employee KYC Under Progress Wait for 2-3 days");
     }
     @Transactional
-    public Set<EmployeeDTO> getEmployees(Integer id)
+    public List<EmployeeDTO> getEmployees(Integer id,Integer pageNumber,Integer pageSize)
     {
         Company company= getCompanyById(id);
 
-        Set<EmployeeDTO> employeeDTOS=new HashSet<>();
-        for(Employee employee:company.getEmployees())
+        List<EmployeeDTO> employeeDTOS=new LinkedList<>();
+
+        for(Employee employee:this.getEmployeePagination(pageNumber,pageSize,company.getEmployees()))
         {
             employeeDTOS.add(parseEmployee(employee));
         }
@@ -89,11 +91,11 @@ public class CompanyService {
 
 
     @Transactional
-    public Set<EmployeeDTO> getEmployeesByStatus(Integer companyId, String status){
+    public Set<EmployeeDTO> getEmployeesByStatus(Integer companyId, String status,Integer pageNumber,Integer pageSize){
         Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         Company company= getCompanyById(companyId);
-        Set<Employee> employeesbyStatus=company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase(status);}).collect(Collectors.toSet());
-        for(Employee e:employeesbyStatus)
+        Set<Employee> employeesByStatus=company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase(status);}).collect(Collectors.toSet());
+        for(Employee e:this.getEmployeePagination(pageNumber,pageSize,employeesByStatus))
         {
             employeeDTOS.add(parseEmployee(e));
         }
@@ -123,7 +125,7 @@ public class CompanyService {
         Company company=getCompanyById(id);
         return parseCompany(company);
     }
-    @Transactional
+
     public EmployeeDTO getEmployeeByName(Integer companyId,String name) {
         Company company = getCompanyById(companyId);
         Set<Employee> employeeList = company.getEmployees();
@@ -134,12 +136,12 @@ public class CompanyService {
         return parseEmployee(employeebyname);
     }
     @Transactional
-    public Set<EmployeeDTO> getEmployeesSortedByName()
+    public Set<EmployeeDTO> getEmployeesSortedByName(Integer pageNumber,Integer pageSize)
     {
         Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         List<Employee> employee=employeeRepository.findAll();
-        List<Employee> employeeSorted= employee.stream().sorted(Comparator.comparing(Employee::getFirstName)).collect(Collectors.toList());
-        for(Employee e:employeeSorted)
+        Set<Employee> employeeSorted= employee.stream().sorted(Comparator.comparing(Employee::getFirstName)).collect(Collectors.toSet());
+        for(Employee e:this.getEmployeePagination(pageNumber,pageSize,employeeSorted))
         {
             employeeDTOS.add(parseEmployee(e));
         }
@@ -147,12 +149,12 @@ public class CompanyService {
     }
 
     @Transactional
-    public Set<EmployeeDTO> getRegisteredEmployees(Integer id)
+    public Set<EmployeeDTO> getRegisteredEmployees(Integer id,Integer pageNumber,Integer pageSize)
     {   Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         Company company=getCompanyById(id);
         Set<Employee> employee=company.getEmployees();
         Set<Employee> registeredEmployees =company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Registered");}).collect(Collectors.toSet());
-        for(Employee e:registeredEmployees)
+        for(Employee e:this.getEmployeePagination(pageNumber,pageSize,registeredEmployees))
         {
             employeeDTOS.add(parseEmployee(e));
         }
@@ -160,36 +162,36 @@ public class CompanyService {
     }
 
     @Transactional
-    public Set<EmployeeDTO> getEmployeesWithPendingKYC(Integer id)
+    public Set<EmployeeDTO> getEmployeesWithPendingKYC(Integer id,Integer pageNumber,Integer pageSize)
     {   Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         Company company=getCompanyById(id);
         Set<Employee> employee=company.getEmployees();
         Set<Employee> pendingEmployees =company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Pending");}).collect(Collectors.toSet());
-        for(Employee pendingEmployee:pendingEmployees)
+        for(Employee pendingEmployee:this.getEmployeePagination(pageNumber,pageSize,pendingEmployees))
         {
             employeeDTOS.add(parseEmployee(pendingEmployee));
         }
         return employeeDTOS;
     }
     @Transactional
-    public Set<EmployeeDTO> getEmployeesWithRejectedKYC(Integer id)
+    public Set<EmployeeDTO> getEmployeesWithRejectedKYC(Integer id,Integer pageNumber,Integer pageSize)
     {
         Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         Company company=getCompanyById(id);
         Set<Employee> employee=company.getEmployees();
         Set<Employee> rejectedEmployees = company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Rejected");}).collect(Collectors.toSet());
-        for(Employee e:rejectedEmployees)
+        for(Employee e:this.getEmployeePagination(pageNumber,pageSize,rejectedEmployees))
         {
             employeeDTOS.add(parseEmployee(e));
         }
         return employeeDTOS;
     }
     @Transactional
-    public Set<EmployeeDTO> getEmployeesByDateOfApplication(String date)
+    public Set<EmployeeDTO> getEmployeesByDateOfApplication(String date,Integer pageNumber,Integer pageSize)
     {
         Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         List<Employee> employeeList=employeeRepository.findAll();
-        List<Employee> employees=new LinkedList<>();
+       Set<Employee> employees=new HashSet<>();
         for(Employee e:employeeList){
             String s=e.getDateTimeOfApplication().toString();
             if(s.equalsIgnoreCase(date))
@@ -198,17 +200,36 @@ public class CompanyService {
             }
 
         }
-        for(Employee employee:employees)
+        for(Employee employee:this.getEmployeePagination(pageNumber,pageSize,employees))
         {
             employeeDTOS.add(parseEmployee(employee));
         }
         return employeeDTOS;
+    }
+
+    private List<Employee> getEmployeePagination(Integer pageNumber,Integer pageSize,Set<Employee> employees)
+    {
+
+        Integer lastIndex=employees.size();
+        Integer from=(pageNumber-1)*pageSize;
+        Integer to=from+pageSize;
+        if(from>employees.size()-1) return null;
+        if(to>lastIndex) to=lastIndex;
+        List<Employee> employeeList=new ArrayList<>();
+
+        employees.stream().sorted(Comparator.comparing(Employee::getEmployeeId)).forEach((p)->{
+            employeeList.add(p);
+                });
+
+        return employeeList.subList(from,to);
+
     }
     @Transactional
     private Company getCompanyById(Integer companyId)
     {
         return companyRepository.findById(companyId).get();
     }
+
     private EmployeeDTO parseEmployee(Employee employee)
     {
         EmployeeDTO employeeDTO=new EmployeeDTO();
@@ -223,6 +244,7 @@ public class CompanyService {
         employeeDTO.setDateTimeOfVerification(employee.getDateTimeOfVerification());
         employeeDTO.setDocumentNumber(employee.getDocumentNumber());
         employeeDTO.setCompanyId(employee.getCompanyId());
+        employeeDTO.setCapturedImage(employee.getCapturedImage());
         employeeDTO.setDocumentType(employee.getDocumentType());
         return  employeeDTO;
     }
