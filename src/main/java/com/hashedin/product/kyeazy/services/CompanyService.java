@@ -244,6 +244,7 @@ public class CompanyService {
         employeeDTO.setDateTimeOfVerification(employee.getDateTimeOfVerification());
         employeeDTO.setDocumentNumber(employee.getDocumentNumber());
         employeeDTO.setCompanyId(employee.getCompanyId());
+        employeeDTO.setStatus(employee.getStatus());
         employeeDTO.setCapturedImage(employee.getCapturedImage());
         employeeDTO.setDocumentType(employee.getDocumentType());
         return  employeeDTO;
