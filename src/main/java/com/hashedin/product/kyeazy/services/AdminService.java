@@ -1,5 +1,7 @@
 package com.hashedin.product.kyeazy.services;
+import com.hashedin.product.kyeazy.dto.CompanyDTO;
 import com.hashedin.product.kyeazy.dto.EmployeeDTO;
+import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.repositories.CompanyRepository;
 import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
@@ -56,6 +58,37 @@ public class AdminService {
     }
 
     @Transactional
+    public List<EmployeeDTO> getEmployees(Integer id,Integer pageNumber,Integer pageSize)
+    {
+        Company company= getCompanyById(id);
+
+        List<EmployeeDTO> employeeDTOS=new LinkedList<>();
+
+        for(Employee employee:this.getEmployeePagination(pageNumber,pageSize,company.getEmployees()))
+        {
+            employeeDTOS.add(parseEmployee(employee));
+        }
+
+        return  employeeDTOS;
+    }
+
+    @Transactional
+    public List<CompanyDTO> getCompanies(Integer pageNumber,Integer pageSize)
+    {
+        List<Company> companies=companyRepository.findAll();
+        Set<Company> companySet= companies.stream().collect(Collectors.toSet());
+
+        List<CompanyDTO> companyDTOS=new LinkedList<>();
+
+        for(Company company:this.getCompanyPagination(pageNumber,pageSize,companySet))
+        {
+            companyDTOS.add(parseCompany(company));
+        }
+
+        return  companyDTOS;
+    }
+
+    @Transactional
     public Set<EmployeeDTO> viewAcceptedApplications(Integer pageNumber,Integer pageSize)
     {
         Set<EmployeeDTO> employeeDTOS=new HashSet<>();
@@ -99,6 +132,36 @@ public class AdminService {
         return profilePictureBytes;
     }
 
+    private List<Company> getCompanyPagination(Integer pageNumber,Integer pageSize,Set<Company> companies)
+    {
+
+        Integer lastIndex=companies.size();
+        Integer from=(pageNumber-1)*pageSize;
+        Integer to=from+pageSize;
+        if(from>companies.size()-1) return null;
+        if(to>lastIndex) to=lastIndex;
+        List<Company> companyList=new ArrayList<>();
+
+        companies.stream().sorted(Comparator.comparing(Company::getCompanyId)).forEach((p)->{
+            companyList.add(p);
+        });
+
+        return companyList.subList(from,to);
+
+    }
+    private CompanyDTO parseCompany(Company company)
+    {
+        CompanyDTO companyDTO=new CompanyDTO();
+        companyDTO.setEmployees(company.getEmployees());
+        companyDTO.setCompanyId(company.getCompanyId());
+        companyDTO.setCompanyDescription(company.getCompanyDescription());
+        companyDTO.setName(company.getName());
+        companyDTO.setCINNumber(company.getCinNumber());
+        companyDTO.setUsername(company.getUsername());
+        companyDTO.setAddress(companyDTO.getAddress());
+        return  companyDTO;
+    }
+
     private EmployeeDTO parseEmployee(Employee employee)
     {
         EmployeeDTO employeeDTO=new EmployeeDTO();
@@ -118,6 +181,11 @@ public class AdminService {
         employeeDTO.setCapturedImage(employee.getCapturedImage());
         //  employeeDTO.setCapturedImage(employee.getCapturedImage());
         return  employeeDTO;
+    }
+    @Transactional
+    private Company getCompanyById(Integer companyId)
+    {
+        return companyRepository.findById(companyId).get();
     }
     private List<Employee> getEmployeePagination(Integer pageNumber,Integer pageSize,Set<Employee> employees)
     {

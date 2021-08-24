@@ -138,11 +138,10 @@ public class CompanyService {
         return parseEmployee(employeebyname);
     }
     @Transactional
-    public Set<EmployeeDTO> getEmployeesSortedByName(Integer pageNumber,Integer pageSize)
-    {
+    public Set<EmployeeDTO> getEmployeesSortedByName(Integer id,Integer pageNumber,Integer pageSize)
+    {   Company company=companyRepository.findById(id).get();
         Set<EmployeeDTO> employeeDTOS=new LinkedHashSet<>();
-        List<Employee> employee=employeeRepository.findAll();
-        LinkedHashSet<Employee> employeeSorted= employee.stream().collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<Employee> employeeSorted= company.getEmployees();
         for(Employee e:getSortedEmployeePagination(pageNumber,pageSize,employeeSorted,"name"))
         {
             employeeDTOS.add(parseEmployee(e));
@@ -151,11 +150,11 @@ public class CompanyService {
     }
 
     @Transactional
-    public Set<EmployeeDTO> getEmployeesSortedByDate(Integer pageNumber,Integer pageSize)
+    public Set<EmployeeDTO> getEmployeesSortedByDate(Integer id,Integer pageNumber,Integer pageSize)
     {
+        Company company=companyRepository.findById(id).get();
         Set<EmployeeDTO> employeeDTOS=new LinkedHashSet<>();
-        List<Employee> employee=employeeRepository.findAll();
-        LinkedHashSet<Employee> employeeSorted= employee.stream().collect(Collectors.toCollection(LinkedHashSet::new));
+        Set<Employee> employeeSorted= company.getEmployees();;
         for(Employee e:getSortedEmployeePagination(pageNumber,pageSize,employeeSorted,"date"))
         {
             employeeDTOS.add(parseEmployee(e));
