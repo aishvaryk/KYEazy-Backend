@@ -39,13 +39,13 @@ public class CompanyService {
             if(companyToCheck.getUsername().equals(company.getUsername()))throw new DataNotFoundException("The Username is already registered !!!!!");
             if(companyToCheck.getCinNumber().equalsIgnoreCase(company.getCinNumber()))throw new DataNotFoundException("The Company is already registered !!!!!");
         }
-        if (company.getName() == null || company.getName().length() == 0) {
-            throw new RequiredFieldException("Company name can't be empty.");
-        }
-
-        if (company.getCompanyDescription() == null || company.getCompanyDescription().length() == 0) {
-            throw new RequiredFieldException("Company Description can't be empty.");
-        }
+//        if (company.getName() == null || company.getName().length() == 0) {
+//            throw new RequiredFieldException("Company name can't be empty.");
+//        }
+//
+//        if (company.getCompanyDescription() == null || company.getCompanyDescription().length() == 0) {
+//            throw new RequiredFieldException("Company Description can't be empty.");
+//        }
         Company addedCompany = companyRepository.save(company);
         return new ActionDTO(addedCompany.getCompanyId(), true, "Company Added Successfully");
     }
@@ -95,6 +95,8 @@ public class CompanyService {
         Set<EmployeeDTO> employeeDTOS=new HashSet<>();
         Company company= getCompanyById(companyId);
         Set<Employee> employeesByStatus=company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase(status);}).collect(Collectors.toSet());
+        if(employeesByStatus.isEmpty())
+            return employeeDTOS;
         for(Employee e:this.getEmployeePagination(pageNumber,pageSize,employeesByStatus))
         {
             employeeDTOS.add(parseEmployee(e));
@@ -138,10 +140,23 @@ public class CompanyService {
     @Transactional
     public Set<EmployeeDTO> getEmployeesSortedByName(Integer pageNumber,Integer pageSize)
     {
-        Set<EmployeeDTO> employeeDTOS=new HashSet<>();
+        Set<EmployeeDTO> employeeDTOS=new LinkedHashSet<>();
         List<Employee> employee=employeeRepository.findAll();
-        Set<Employee> employeeSorted= employee.stream().sorted(Comparator.comparing(Employee::getFirstName)).collect(Collectors.toSet());
-        for(Employee e:this.getEmployeePagination(pageNumber,pageSize,employeeSorted))
+        LinkedHashSet<Employee> employeeSorted= employee.stream().collect(Collectors.toCollection(LinkedHashSet::new));
+        for(Employee e:getSortedEmployeePagination(pageNumber,pageSize,employeeSorted,"name"))
+        {
+            employeeDTOS.add(parseEmployee(e));
+        }
+        return employeeDTOS;
+    }
+
+    @Transactional
+    public Set<EmployeeDTO> getEmployeesSortedByDate(Integer pageNumber,Integer pageSize)
+    {
+        Set<EmployeeDTO> employeeDTOS=new LinkedHashSet<>();
+        List<Employee> employee=employeeRepository.findAll();
+        LinkedHashSet<Employee> employeeSorted= employee.stream().collect(Collectors.toCollection(LinkedHashSet::new));
+        for(Employee e:getSortedEmployeePagination(pageNumber,pageSize,employeeSorted,"date"))
         {
             employeeDTOS.add(parseEmployee(e));
         }
@@ -155,32 +170,6 @@ public class CompanyService {
         Set<Employee> employee=company.getEmployees();
         Set<Employee> registeredEmployees =company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Registered");}).collect(Collectors.toSet());
         for(Employee e:this.getEmployeePagination(pageNumber,pageSize,registeredEmployees))
-        {
-            employeeDTOS.add(parseEmployee(e));
-        }
-        return employeeDTOS;
-    }
-
-    @Transactional
-    public Set<EmployeeDTO> getEmployeesWithPendingKYC(Integer id,Integer pageNumber,Integer pageSize)
-    {   Set<EmployeeDTO> employeeDTOS=new HashSet<>();
-        Company company=getCompanyById(id);
-        Set<Employee> employee=company.getEmployees();
-        Set<Employee> pendingEmployees =company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Pending");}).collect(Collectors.toSet());
-        for(Employee pendingEmployee:this.getEmployeePagination(pageNumber,pageSize,pendingEmployees))
-        {
-            employeeDTOS.add(parseEmployee(pendingEmployee));
-        }
-        return employeeDTOS;
-    }
-    @Transactional
-    public Set<EmployeeDTO> getEmployeesWithRejectedKYC(Integer id,Integer pageNumber,Integer pageSize)
-    {
-        Set<EmployeeDTO> employeeDTOS=new HashSet<>();
-        Company company=getCompanyById(id);
-        Set<Employee> employee=company.getEmployees();
-        Set<Employee> rejectedEmployees = company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Rejected");}).collect(Collectors.toSet());
-        for(Employee e:this.getEmployeePagination(pageNumber,pageSize,rejectedEmployees))
         {
             employeeDTOS.add(parseEmployee(e));
         }
@@ -220,6 +209,31 @@ public class CompanyService {
         employees.stream().sorted(Comparator.comparing(Employee::getEmployeeId)).forEach((p)->{
             employeeList.add(p);
                 });
+
+        return employeeList.subList(from,to);
+
+    }
+
+    private List<Employee> getSortedEmployeePagination(Integer pageNumber,Integer pageSize,Set<Employee> employees,
+                                                       String parameter )
+    {
+
+        Integer lastIndex=employees.size();
+        Integer from=(pageNumber-1)*pageSize;
+        Integer to=from+pageSize;
+        if(from>employees.size()-1) return null;
+        if(to>lastIndex) to=lastIndex;
+        List<Employee> employeeList=new ArrayList<>();
+        if(parameter.equalsIgnoreCase("name")) {
+            employees.stream().sorted(Comparator.comparing(Employee::getFirstName)).forEach((p) -> {
+                employeeList.add(p);
+            });
+        }
+        if(parameter.equalsIgnoreCase("date")) {
+            employees.stream().sorted(Comparator.comparing(Employee::getDateTimeOfApplication)).forEach((p) -> {
+                employeeList.add(p);
+            });
+        }
 
         return employeeList.subList(from,to);
 
