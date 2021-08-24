@@ -70,6 +70,11 @@ public class CompanyController {
         return companyService.getEmployeesSortedByName(pageNumber,pageSize);
     }
 
+    @GetMapping("/get-employees-sorted-by-date")
+    public Set<EmployeeDTO> getEmployeesSortedByDate(@RequestParam Integer pageNumber,@RequestParam Integer pageSize) {
+        return companyService.getEmployeesSortedByDate(pageNumber,pageSize);
+    }
+
 
     @GetMapping("/get-employees-by-name/{id}/{name}")
     public EmployeeDTO getEmployeeByName(@PathVariable Integer id, @PathVariable String name) {
