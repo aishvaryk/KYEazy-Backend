@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 
 
 @SpringBootApplication
-@EnableAutoConfiguration(exclude = {org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class})
-
-
+//@EnableAutoConfiguration(exclude = {org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration.class})
 
 public class KyeazyApplication {
 
