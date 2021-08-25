@@ -80,6 +80,7 @@ public class CompanyController {
     public EmployeeDTO getEmployeeByName(@PathVariable Integer id, @PathVariable String name) {
         return companyService.getEmployeeByName(id,name);
     }
+
 /*
     @GetMapping ("/get-employees-with-pending-kyc/{id}")
     public Set<EmployeeDTO> getEmployeesWithPendingKYC(@PathVariable Integer id,@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
@@ -96,7 +97,9 @@ public class CompanyController {
         return companyService.getEmployeesWithRejectedKYC(id,pageNumber,pageSize);
     }
 */
-    @GetMapping ("/get-employees-by-date-of-application/{id}/{date}")
+
+
+    @GetMapping ("/get-employees-by-date-of-application/{date}")
     public Set<EmployeeDTO> getEmployeesByDateOfApplication(@PathVariable String date,@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
         //Instant timestamp = null;
         //LocalDateTime dateTime = LocalDateTime.parse("2018-05-05T11:50:55");

@@ -1,6 +1,7 @@
 package com.hashedin.product.kyeazy.controllers;
 
 import com.hashedin.product.kyeazy.dto.ActionDTO;
+import com.hashedin.product.kyeazy.dto.CompanyDTO;
 import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.services.AdminService;
@@ -70,6 +71,15 @@ public class AdminController {
         return adminService.getEmployeeImage(employeeId);
     }
 */
+    @GetMapping("/employees/{companyId}")
+    public List<EmployeeDTO> getEmployees(@PathVariable Integer companyId,@RequestParam Integer pageNumber,@RequestParam Integer pageSize) {
+    return adminService.getEmployees(companyId,pageNumber,pageSize);
+    }
+
+    @GetMapping("/companies")
+    public List<CompanyDTO> getCompanies(@RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
+        return adminService.getCompanies(pageNumber,pageSize);
+    }
 
     @RequestMapping("/verify/{id}/{status}")
     public EmployeeDTO verify(@PathVariable Integer id,@PathVariable String status)
