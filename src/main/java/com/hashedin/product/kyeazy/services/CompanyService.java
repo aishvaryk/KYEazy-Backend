@@ -298,8 +298,26 @@ public class CompanyService {
 
     private CompanyDTO parseCompany(Company company)
     {
+        Integer pendingEmployees=1;
+
         CompanyDTO companyDTO=new CompanyDTO();
-        companyDTO.setEmployees(company.getEmployees());
+     //   companyDTO.setEmployees(company.getEmployees());
+        List<EmployeeDTO> employeeDTOS=new LinkedList<>();
+        EmployeeDTO employeeDTO ;
+        for(Employee employee:company.getEmployees())
+        {
+            System.out.println(employee.getStatus());
+            if(employee.getStatus().equalsIgnoreCase("Pending"))
+            {
+                pendingEmployees+=1;
+            }
+            employeeDTO=parseEmployee(employee);
+            employeeDTOS.add(employeeDTO);
+
+        }
+        companyDTO.setNumberOfPendingEmployees(pendingEmployees);
+        companyDTO.setEmployees(employeeDTOS);
+
         companyDTO.setCompanyId(company.getCompanyId());
         companyDTO.setCompanyDescription(company.getCompanyDescription());
         companyDTO.setName(company.getName());

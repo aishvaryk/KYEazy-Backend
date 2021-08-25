@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Set;
 @Getter
 @Setter
@@ -18,5 +19,6 @@ public class CompanyDTO {
     private  String companyDescription;
     private  String  CINNumber;
     private  String address;
-    private Set<Employee> employees;
+    private List<EmployeeDTO> employees;
+    private Integer numberOfPendingEmployees;
 }
