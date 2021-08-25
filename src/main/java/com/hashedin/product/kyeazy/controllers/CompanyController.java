@@ -80,7 +80,6 @@ public class CompanyController {
     public EmployeeDTO getEmployeeByName(@PathVariable Integer id, @PathVariable String name) {
         return companyService.getEmployeeByName(id,name);
     }
-
 /*
     @GetMapping ("/get-employees-with-pending-kyc/{id}")
     public Set<EmployeeDTO> getEmployeesWithPendingKYC(@PathVariable Integer id,@RequestParam Integer pageNumber,@RequestParam Integer pageSize){

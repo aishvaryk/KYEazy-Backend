@@ -144,6 +144,7 @@ public class CompanyService {
         List<Employee> employee=employeeRepository.findAll();
         LinkedHashSet<Employee> employeeSorted= employee.stream().filter(p->{ return p.getCompanyId()==id;}).collect(Collectors.toCollection(LinkedHashSet::new));
 //    {   Company company=companyRepository.findById(id).get();
+
         for(Employee e:getSortedEmployeePagination(pageNumber,pageSize,employeeSorted,"name"))
         {
             employeeDTOS.add(parseEmployee(e));
