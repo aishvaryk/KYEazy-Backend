@@ -259,6 +259,7 @@ public class CompanyService {
         employeeDTO.setCompanyId(employee.getCompanyId());
         employeeDTO.setCapturedImage(employee.getCapturedImage());
         employeeDTO.setDocumentType(employee.getDocumentType());
+        employeeDTO.setStatus(employee.getStatus());
         return  employeeDTO;
     }
     private String generateUsername(Employee employee) {
