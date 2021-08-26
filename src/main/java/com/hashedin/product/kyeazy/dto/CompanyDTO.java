@@ -17,8 +17,11 @@ public class CompanyDTO {
     private  String username;
     private  String name;
     private  String companyDescription;
-    private  String  CINNumber;
+    private  String  CinNumber;
     private  String address;
     private List<EmployeeDTO> employees;
     private Integer numberOfPendingEmployees;
+    private Integer numberOfAcceptedEmployees;
+    private Integer numberOfRejectedEmployees;
+    private Integer numberOfTotalEmployees;
 }
