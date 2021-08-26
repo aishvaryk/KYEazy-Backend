@@ -129,7 +129,7 @@ public class CompanyService {
         return new ActionDTO(companyUpdated.getCompanyId(), true, "Company details Updated");
     }
 
-
+    @Transactional
     public CompanyDTO getCompanyDetails(Integer id)
     {
         Company company=getCompanyById(id);
