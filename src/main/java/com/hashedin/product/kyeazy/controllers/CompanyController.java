@@ -87,7 +87,7 @@ public class CompanyController {
 
 
     @GetMapping("/get-employees-by-name/{id}/{name}")
-    public EmployeeDTO getEmployeeByName(@PathVariable Integer id, @PathVariable String name) {
+    public List<EmployeeDTO> getEmployeeByName(@PathVariable Integer id, @PathVariable String name) {
         return companyService.getEmployeeByName(id,name);
     }
 /*

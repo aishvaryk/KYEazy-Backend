@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.transaction.SystemException;
 import javax.transaction.Transactional;
 import java.io.BufferedReader;
 import java.io.File;
@@ -135,15 +136,21 @@ public class CompanyService {
         Company company=getCompanyById(id);
         return parseCompany(company);
     }
-
-    public EmployeeDTO getEmployeeByName(Integer companyId,String name) {
+@Transactional
+    public List<EmployeeDTO> getEmployeeByName(Integer companyId,String name) {
         Company company = getCompanyById(companyId);
         Set<Employee> employeeList = company.getEmployees();
-        Employee employeebyname= employeeList.stream()
-                .filter(employee -> name.equalsIgnoreCase(employee.getFirstName() + employee.getLastName()))
-                .findAny()
-                .orElse(null);
-        return parseEmployee(employeebyname);
+    System.out.println(name);
+        List<Employee> employeebyname= employeeList.stream()
+                .filter(employee -> name.equalsIgnoreCase(employee.getFirstName() + " "+employee.getLastName()))
+                .collect(Collectors.toList());
+
+        List<EmployeeDTO> employeesByName=new LinkedList<>();
+        for(Employee e:employeebyname)
+        {
+          employeesByName.add(parseEmployee(e));
+        }
+        return employeesByName;
     }
     @Transactional
     public Set<EmployeeDTO> getEmployeesSortedByName(Integer id,Integer pageNumber,Integer pageSize)
