@@ -149,14 +149,44 @@ public class AdminService {
         return companyList.subList(from,to);
 
     }
+    @Transactional
     private CompanyDTO parseCompany(Company company)
     {
         CompanyDTO companyDTO=new CompanyDTO();
-        companyDTO.setEmployees(company.getEmployees());
+        List<EmployeeDTO> employeeDTOS=new LinkedList<>();
+        EmployeeDTO employeeDTO ;
+        Integer pendingEmployees=0;
+        Integer rejectedEmployees=0;
+        Integer acceptedEmployees=0;
+        Integer totalEmployees=0;
+            for(Employee employee:company.getEmployees())
+        {
+            if(employee.getStatus().equalsIgnoreCase("Pending"))
+            {
+                pendingEmployees+=1;
+            }
+            if(employee.getStatus().equalsIgnoreCase("Rejected"))
+            {
+                rejectedEmployees+=1;
+            }
+            if(employee.getStatus().equalsIgnoreCase("Accepted"))
+            {
+                acceptedEmployees+=1;
+            }
+            totalEmployees+=1;
+            employeeDTO=parseEmployee(employee);
+            employeeDTOS.add(employeeDTO);
+
+        }
+        companyDTO.setNumberOfTotalEmployees(totalEmployees);
+        companyDTO.setNumberOfPendingEmployees(pendingEmployees);
+        companyDTO.setNumberOfRejectedEmployees(rejectedEmployees);
+        companyDTO.setNumberOfAcceptedEmployees(acceptedEmployees);
+        companyDTO.setEmployees(employeeDTOS);
         companyDTO.setCompanyId(company.getCompanyId());
         companyDTO.setCompanyDescription(company.getCompanyDescription());
         companyDTO.setName(company.getName());
-        companyDTO.setCINNumber(company.getCinNumber());
+        companyDTO.setCinNumber(company.getCinNumber());
         companyDTO.setUsername(company.getUsername());
         companyDTO.setAddress(companyDTO.getAddress());
         return  companyDTO;
