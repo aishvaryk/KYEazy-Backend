@@ -11,7 +11,15 @@ import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
 import jdk.dynalink.linker.GuardingDynamicLinkerExporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import javax.transaction.Transactional;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -328,6 +336,30 @@ public class CompanyService {
     }
 
 
+    public ActionDTO registerEmployees(Integer id, MultipartFile employeesList) throws IOException {
+
+        System.out.println("Chalaaa"+employeesList.getInputStream());
+        String DELIMITER = ",";
+        InputStreamReader isr = new InputStreamReader(employeesList.getInputStream(),
+                StandardCharsets.UTF_8);
+        BufferedReader br = new BufferedReader(isr);
+        String line;
+        //String[] columns=[];
+        Employee employee;
+        br.readLine();
+        while ((line = br.readLine()) != null) {
+            employee=new Employee();
+          String[]  columns = line.split(DELIMITER);
+            employee.setFirstName(columns[0]);
+            employee.setLastName(columns[1]);
+            employee.setEmailID(columns[2]);
+            employee.setContactNumber(columns[3]);
+            employee.setCompanyId(id);
+            employee.setStatus("Registered");
+            employeeRepository.save(employee);
+        }
+        return new ActionDTO(1,true,"Employees Added Successfully !");
+    }
 }
 
 

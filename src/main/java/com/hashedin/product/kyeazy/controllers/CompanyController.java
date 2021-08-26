@@ -11,8 +11,12 @@ import com.hashedin.product.kyeazy.exceptions.response.ExceptionResponse;
 import com.hashedin.product.kyeazy.services.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -41,6 +45,12 @@ public class CompanyController {
     @PostMapping(value = "/register")
     public ActionDTO register(@RequestBody Company company) {
         return companyService.register(company);
+    }
+
+    @PostMapping(value="/register-employees/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ActionDTO registerEmployees(@PathVariable Integer id, @RequestParam("employeeCSV") MultipartFile employeeVideo) throws IOException
+    {
+        return  companyService.registerEmployees(id,employeeVideo);
     }
 
     @PostMapping(value = "/register-employee/{companyId}")
