@@ -131,4 +131,13 @@ public class CompanyController {
         return new ResponseEntity<>(error, HttpStatus.LENGTH_REQUIRED);
 
     }
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponse> handleException(Exception exc) {
+        ExceptionResponse error = new ExceptionResponse();
+        error.setStatus(HttpStatus.LENGTH_REQUIRED.value());
+        error.setMessage(exc.getMessage());
+        error.setTimeStamp(System.currentTimeMillis());
+        return new ResponseEntity<>(error, HttpStatus.LENGTH_REQUIRED);
+
+    }
 }
