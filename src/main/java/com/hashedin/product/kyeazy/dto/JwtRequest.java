@@ -14,6 +14,7 @@ public class JwtRequest
 
     String username;
     String password;
+    String role;
 
     @Override
     public String toString() {
