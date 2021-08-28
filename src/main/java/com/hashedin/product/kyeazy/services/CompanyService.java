@@ -11,7 +11,16 @@ import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
 import jdk.dynalink.linker.GuardingDynamicLinkerExporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.transaction.SystemException;
 import javax.transaction.Transactional;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -131,21 +140,27 @@ public class CompanyService {
         return new ActionDTO(companyUpdated.getCompanyId(), true, "Company details Updated");
     }
 
-
+    @Transactional
     public CompanyDTO getCompanyDetails(Integer id)
     {
         Company company=getCompanyById(id);
         return parseCompany(company);
     }
-
-    public EmployeeDTO getEmployeeByName(Integer companyId,String name) {
+@Transactional
+    public List<EmployeeDTO> getEmployeeByName(Integer companyId,String name) {
         Company company = getCompanyById(companyId);
         Set<Employee> employeeList = company.getEmployees();
-        Employee employeebyname= employeeList.stream()
-                .filter(employee -> name.equalsIgnoreCase(employee.getFirstName() + employee.getLastName()))
-                .findAny()
-                .orElse(null);
-        return parseEmployee(employeebyname);
+    System.out.println(name);
+        List<Employee> employeebyname= employeeList.stream()
+                .filter(employee -> name.equalsIgnoreCase(employee.getFirstName() + " "+employee.getLastName()))
+                .collect(Collectors.toList());
+
+        List<EmployeeDTO> employeesByName=new LinkedList<>();
+        for(Employee e:employeebyname)
+        {
+          employeesByName.add(parseEmployee(e));
+        }
+        return employeesByName;
     }
     @Transactional
     public Set<EmployeeDTO> getEmployeesSortedByName(Integer id,Integer pageNumber,Integer pageSize)
@@ -153,6 +168,8 @@ public class CompanyService {
         Set<EmployeeDTO> employeeDTOS=new LinkedHashSet<>();
         List<Employee> employee=employeeRepository.findAll();
         LinkedHashSet<Employee> employeeSorted= employee.stream().filter(p->{ return p.getCompanyId()==id;}).collect(Collectors.toCollection(LinkedHashSet::new));
+//    {   Company company=companyRepository.findById(id).get();
+
         for(Employee e:getSortedEmployeePagination(pageNumber,pageSize,employeeSorted,"name"))
         {
             employeeDTOS.add(parseEmployee(e));
@@ -163,6 +180,7 @@ public class CompanyService {
     @Transactional
     public Set<EmployeeDTO> getEmployeesSortedByDate(Integer id,Integer pageNumber,Integer pageSize)
     {
+        Company company=companyRepository.findById(id).get();
         Set<EmployeeDTO> employeeDTOS=new LinkedHashSet<>();
         List<Employee> employee=employeeRepository.findAll();
         LinkedHashSet<Employee> employeeSorted= employee.stream().filter(p->{ return p.getCompanyId()==id;}).collect(Collectors.toCollection(LinkedHashSet::new));
@@ -271,6 +289,7 @@ public class CompanyService {
         employeeDTO.setStatus(employee.getStatus());
         employeeDTO.setCapturedImage(employee.getCapturedImage());
         employeeDTO.setDocumentType(employee.getDocumentType());
+        employeeDTO.setStatus(employee.getStatus());
         return  employeeDTO;
     }
     private String generateUsername(Employee employee) {
@@ -310,17 +329,71 @@ public class CompanyService {
     private CompanyDTO parseCompany(Company company)
     {
         CompanyDTO companyDTO=new CompanyDTO();
-        companyDTO.setEmployees(company.getEmployees());
+        List<EmployeeDTO> employeeDTOS=new LinkedList<>();
+        EmployeeDTO employeeDTO ;
+        Integer pendingEmployees=0;
+        Integer rejectedEmployees=0;
+        Integer acceptedEmployees=0;
+        Integer totalEmployees=0;
+        for(Employee employee:company.getEmployees())
+        {
+            if(employee.getStatus().equalsIgnoreCase("Pending"))
+            {
+                pendingEmployees+=1;
+            }
+            if(employee.getStatus().equalsIgnoreCase("Rejected"))
+            {
+                rejectedEmployees+=1;
+            }
+            if(employee.getStatus().equalsIgnoreCase("Accepted"))
+            {
+                acceptedEmployees+=1;
+            }
+            totalEmployees+=1;
+            employeeDTO=parseEmployee(employee);
+            employeeDTOS.add(employeeDTO);
+
+        }
+        companyDTO.setNumberOfTotalEmployees(totalEmployees);
+        companyDTO.setNumberOfPendingEmployees(pendingEmployees);
+        companyDTO.setNumberOfRejectedEmployees(rejectedEmployees);
+        companyDTO.setNumberOfAcceptedEmployees(acceptedEmployees);
+        companyDTO.setEmployees(employeeDTOS);
+
         companyDTO.setCompanyId(company.getCompanyId());
         companyDTO.setCompanyDescription(company.getCompanyDescription());
         companyDTO.setName(company.getName());
-        companyDTO.setCINNumber(company.getCinNumber());
+        companyDTO.setCinNumber(company.getCinNumber());
         companyDTO.setUsername(company.getUsername());
         companyDTO.setAddress(companyDTO.getAddress());
         return  companyDTO;
     }
 
 
+    public ActionDTO registerEmployees(Integer id, MultipartFile employeesList) throws IOException {
+
+        System.out.println("Chalaaa"+employeesList.getInputStream());
+        String DELIMITER = ",";
+        InputStreamReader isr = new InputStreamReader(employeesList.getInputStream(),
+                StandardCharsets.UTF_8);
+        BufferedReader br = new BufferedReader(isr);
+        String line;
+        //String[] columns=[];
+        Employee employee;
+        br.readLine();
+        while ((line = br.readLine()) != null) {
+            employee=new Employee();
+          String[]  columns = line.split(DELIMITER);
+            employee.setFirstName(columns[0]);
+            employee.setLastName(columns[1]);
+            employee.setEmailID(columns[2]);
+            employee.setContactNumber(columns[3]);
+            employee.setCompanyId(id);
+            employee.setStatus("Registered");
+            employeeRepository.save(employee);
+        }
+        return new ActionDTO(1,true,"Employees Added Successfully !");
+    }
 }
 
 

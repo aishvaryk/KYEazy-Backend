@@ -28,4 +28,5 @@ public class EmployeeDTO {
     private  Integer companyId;
     private byte[] capturedImage;
 
+
 }
