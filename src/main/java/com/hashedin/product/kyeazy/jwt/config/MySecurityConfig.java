@@ -29,7 +29,6 @@ public class MySecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf()
                 .disable()
-                .cors().disable()
                 .authorizeRequests()
                 .antMatchers("/token").permitAll()
                 .anyRequest().authenticated()
@@ -44,12 +43,12 @@ public class MySecurityConfig extends WebSecurityConfigurerAdapter {
         super.configure(auth);
         auth.userDetailsService(customUserDetailsService);
     }
-    /*
+
     @Bean
     public PasswordEncoder passwordEncoder()
     {
         return NoOpPasswordEncoder.getInstance();
-    }*/
+    }
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception
     {
