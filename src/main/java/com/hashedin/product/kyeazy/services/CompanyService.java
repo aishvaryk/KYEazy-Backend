@@ -71,8 +71,8 @@ public class CompanyService {
         String passkey = String.valueOf(this.generatePassword(employee));
 
         String link="http://localhost:8085/employee/login";
-        String mailBody="Hey "+employee.getFirstName()+","+"Your Id password for doing kyc is  Username: "+username+" Password:" +passkey +" Link:" +link;
-        //this.emailSender.sendMail(employee.getEmailID(),"Regarding KYC",mailBody);
+//        String mailBody="Hey "+employee.getFirstName()+","+"Your Id password for doing kyc is  Username: "+username+" Password:" +passkey +" Link:" +link;
+//        this.emailSender.sendMail(employee.getEmailID(),"Regarding KYC",mailBody);
 
         employee.setUsername(username);
         employee.setPassword(passkey);
