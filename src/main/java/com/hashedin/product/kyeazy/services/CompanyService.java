@@ -142,6 +142,10 @@ public class CompanyService {
     {   Company company=companyRepository.findById(id).get();
         Set<EmployeeDTO> employeeDTOS=new LinkedHashSet<>();
         Set<Employee> employeeSorted= company.getEmployees();
+//    {
+//        Set<EmployeeDTO> employeeDTOS=new LinkedHashSet<>();
+//        List<Employee> employee=employeeRepository.findAll();
+//        LinkedHashSet<Employee> employeeSorted= employee.stream().filter(p->{ return p.getCompanyId()==id;}).collect(Collectors.toCollection(LinkedHashSet::new));
         for(Employee e:getSortedEmployeePagination(pageNumber,pageSize,employeeSorted,"name"))
         {
             employeeDTOS.add(parseEmployee(e));
@@ -155,6 +159,8 @@ public class CompanyService {
         Company company=companyRepository.findById(id).get();
         Set<EmployeeDTO> employeeDTOS=new LinkedHashSet<>();
         Set<Employee> employeeSorted= company.getEmployees();;
+//        List<Employee> employee=employeeRepository.findAll();
+//        LinkedHashSet<Employee> employeeSorted= employee.stream().filter(p->{ return p.getCompanyId()==id;}).collect(Collectors.toCollection(LinkedHashSet::new));
         for(Employee e:getSortedEmployeePagination(pageNumber,pageSize,employeeSorted,"date"))
         {
             employeeDTOS.add(parseEmployee(e));
@@ -257,6 +263,7 @@ public class CompanyService {
         employeeDTO.setDateTimeOfVerification(employee.getDateTimeOfVerification());
         employeeDTO.setDocumentNumber(employee.getDocumentNumber());
         employeeDTO.setCompanyId(employee.getCompanyId());
+        employeeDTO.setStatus(employee.getStatus());
         employeeDTO.setCapturedImage(employee.getCapturedImage());
         employeeDTO.setDocumentType(employee.getDocumentType());
         employeeDTO.setStatus(employee.getStatus());
