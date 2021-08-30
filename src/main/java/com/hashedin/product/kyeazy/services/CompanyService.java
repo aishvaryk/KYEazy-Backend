@@ -132,7 +132,7 @@ public class CompanyService {
         Company company = getCompanyById(companyId);
         Set<Employee> employeeList = company.getEmployees();
         Employee employeebyname= employeeList.stream()
-                .filter(employee -> name.equalsIgnoreCase(employee.getFirstName() + employee.getLastName()))
+                .filter(employee -> name.startsWith(employee.getFirstName() + employee.getLastName()))
                 .findAny()
                 .orElse(null);
         return parseEmployee(employeebyname);
@@ -267,6 +267,7 @@ public class CompanyService {
         employeeDTO.setCapturedImage(employee.getCapturedImage());
         employeeDTO.setDocumentType(employee.getDocumentType());
         employeeDTO.setStatus(employee.getStatus());
+        employeeDTO.setGender(employee.getGender());
         return  employeeDTO;
     }
     private String generateUsername(Employee employee) {

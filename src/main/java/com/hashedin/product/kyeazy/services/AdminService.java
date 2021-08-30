@@ -209,6 +209,7 @@ public class AdminService {
         employeeDTO.setDocumentType(employee.getDocumentType());
         employeeDTO.setStatus(employee.getStatus());
         employeeDTO.setCapturedImage(employee.getCapturedImage());
+        employeeDTO.setGender(employee.getGender());
         //  employeeDTO.setCapturedImage(employee.getCapturedImage());
         return  employeeDTO;
     }
