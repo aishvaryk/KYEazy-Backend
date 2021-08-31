@@ -44,6 +44,8 @@ public class EmployeeController {
     @PatchMapping("/update-profile")
     public ActionDTO updateProfile(@RequestBody  Employee employee)
     {
+        System.out.println(employee.getEmployeeId());
+        System.out.println(employee.getEmailID());
         return  employeeService.updateProfileData(employee);
     }
     @GetMapping("/view-profile/{employeeId}")

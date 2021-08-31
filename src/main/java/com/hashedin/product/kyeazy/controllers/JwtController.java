@@ -51,18 +51,19 @@ public class JwtController {
         {
             Company company =companyService.getCompanyByUsername(jwtRequest.getUsername());
             if(company==null) throw new Exception("Wrong Username!");
-            if(!company.getPassword().equals(jwtRequest.getPassword())) throw new Exception("Invalid Credentials!");
+            if(! (company.getPassword().equals(jwtRequest.getPassword()))) throw new Exception("Invalid Credentials!");
 
             username+="C"+jwtRequest.getUsername();
             System.out.println("usernaeme"+username);
         }
         if(jwtRequest.getRole().equals("EMPLOYEE"))
         {
-        username+="E"+jwtRequest.getUsername();
+
             Employee employee =employeeService.getEmployeeByUsername(jwtRequest.getUsername());
             if(employee==null) throw new Exception("Wrong Username!");
-            if(!employee.getPassword().equals(jwtRequest.getPassword())) throw new Exception("Invalid Credentials!");
-
+            System.out.println(jwtRequest.getPassword());
+            if(! (employee.getPassword().equals(jwtRequest.getPassword()))) throw new Exception("Invalid Credentials!");
+            username+="E"+jwtRequest.getUsername();
         }
         System.out.println(jwtRequest);
         System.out.println("_________"+username);

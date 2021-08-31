@@ -42,8 +42,10 @@ public class EmployeeService {
 
     public ActionDTO updateEmployeeVideo(Integer employeeId, MultipartFile profileVideo) throws IOException
     {
-       // System.out.println("Current folder: " + (new File(".")).getCanonicalPath());
+       //System.out.println("Current folder: " + (new File(".")).getCanonicalPath());
+        //ClassLoader classLoader = getClass().getClassLoader();
         Employee employee=this.getEmployeeData(employeeId);
+        //File file = new File(classLoader.getResource(".").getFile() + "summary.txt");
         String uploadDir="src/main/resources/employee_videos";
         Path uploadPath = Paths.get(uploadDir);
 
@@ -75,7 +77,11 @@ public class EmployeeService {
     public Employee getEmployeeByUsername(String userName) {
         List<Employee> employees=employeeRepository.findAll();
         for(Employee employeeToCheck:employees) {
-            if(employeeToCheck.getUsername().equals(userName)) return employeeToCheck;
+            if(employeeToCheck.getUsername().equals(userName))
+            {
+                System.out.println(",Milllaaa"+employeeToCheck);
+                return employeeToCheck;
+            }
 
         }
         return null;
