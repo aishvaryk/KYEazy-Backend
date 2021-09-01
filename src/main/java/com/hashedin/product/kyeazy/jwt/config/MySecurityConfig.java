@@ -31,8 +31,10 @@ public class MySecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf()
                 .disable()
                 .cors().and()
-                .authorizeRequests()
-                .antMatchers("/token").permitAll()
+               .authorizeRequests()
+                .antMatchers("/token","/company/register").permitAll()
+                //.antMatchers("/company/register").permitAll()
+
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);

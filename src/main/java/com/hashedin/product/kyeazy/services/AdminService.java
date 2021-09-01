@@ -265,16 +265,12 @@ public class AdminService {
         if (employeebyname.isEmpty()) {
             return employeeDTOS;
         }
-        System.out.println("before emlpo");
 
         for(Employee employee:employeebyname)
         {
             System.out.println(employee);
             employeeList.add(employee);
         }
-
-        System.out.println("after emlpo");
-
         for(Employee employee:this.getEmployeePagination(pageNumber,pageSize,employeeList))
         {
             System.out.println("1  " + employee);

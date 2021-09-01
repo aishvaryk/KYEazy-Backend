@@ -42,6 +42,11 @@ public class EmployeeController {
     {
         return  employeeService.updateEmployeeVideo(id,employeeVideo);
     }
+    @PatchMapping(value="/update-video/{id}/document",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ActionDTO updateDocument(@PathVariable Integer id, @RequestParam("employeeDocument") MultipartFile employeeVideo) throws IOException
+    {
+        return  employeeService.updateEmployeeDocument(id,employeeVideo);
+    }
 
     @PatchMapping("/update-profile")
     public ActionDTO updateProfile(@RequestBody  Employee employee)

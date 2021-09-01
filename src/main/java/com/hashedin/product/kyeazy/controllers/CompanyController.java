@@ -43,7 +43,7 @@ public class CompanyController {
     }
 
     @PostMapping(value = "/register")
-    public ActionDTO register(@RequestBody Company company) {
+    public CompanyDTO register(@RequestBody Company company) {
         return companyService.register(company);
     }
 
