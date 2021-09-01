@@ -152,7 +152,7 @@ public class CompanyService {
         Set<Employee> employeeList = company.getEmployees();
     System.out.println(name);
         List<Employee> employeebyname= employeeList.stream()
-                .filter(employee -> name.equalsIgnoreCase(employee.getFirstName() + " "+employee.getLastName()))
+                .filter(employee -> (employee.getFirstName()+" "+employee.getLastName()).toLowerCase().startsWith(name.toLowerCase()))
                 .collect(Collectors.toList());
 
         List<EmployeeDTO> employeesByName=new LinkedList<>();
@@ -180,7 +180,6 @@ public class CompanyService {
     @Transactional
     public Set<EmployeeDTO> getEmployeesSortedByDate(Integer id,Integer pageNumber,Integer pageSize)
     {
-        Company company=companyRepository.findById(id).get();
         Set<EmployeeDTO> employeeDTOS=new LinkedHashSet<>();
         List<Employee> employee=employeeRepository.findAll();
         LinkedHashSet<Employee> employeeSorted= employee.stream().filter(p->{ return p.getCompanyId()==id;}).collect(Collectors.toCollection(LinkedHashSet::new));
@@ -290,6 +289,7 @@ public class CompanyService {
         employeeDTO.setCapturedImage(employee.getCapturedImage());
         employeeDTO.setDocumentType(employee.getDocumentType());
         employeeDTO.setStatus(employee.getStatus());
+        employeeDTO.setGender(employee.getGender());
         return  employeeDTO;
     }
     private String generateUsername(Employee employee) {

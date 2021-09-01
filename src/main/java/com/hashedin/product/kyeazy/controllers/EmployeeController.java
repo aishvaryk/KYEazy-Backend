@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 import java.io.IOException;
 
 @CrossOrigin(origins = "*")
@@ -52,5 +54,10 @@ public class EmployeeController {
     public Employee viewProfile(@PathVariable Integer employeeId)
     {
         return  employeeService.getEmployeeData(employeeId);
+    }
+    @GetMapping("/get-employee-video/{employeeId}")
+    public File getEmployeeVideo(@PathVariable Integer employeeId)
+    {
+        return  null;
     }
 }
