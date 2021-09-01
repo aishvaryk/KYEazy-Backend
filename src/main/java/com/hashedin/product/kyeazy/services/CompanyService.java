@@ -12,15 +12,11 @@ import jdk.dynalink.linker.GuardingDynamicLinkerExporter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.transaction.SystemException;
 import javax.transaction.Transactional;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -48,7 +44,7 @@ public class CompanyService {
     }
 
 
-    public ActionDTO register(Company company) {
+    public CompanyDTO register(Company company) {
 
         //company uniqueness check
 
@@ -66,7 +62,8 @@ public class CompanyService {
 //            throw new RequiredFieldException("Company Description can't be empty.");
 //        }
         Company addedCompany = companyRepository.save(company);
-        return new ActionDTO(addedCompany.getCompanyId(), true, "Company Added Successfully");
+
+        return parseCompany(addedCompany);
     }
 
     public ActionDTO registerEmployee(Employee employee,int companyId) {
@@ -152,7 +149,7 @@ public class CompanyService {
         Set<Employee> employeeList = company.getEmployees();
     System.out.println(name);
         List<Employee> employeebyname= employeeList.stream()
-                .filter(employee -> name.equalsIgnoreCase(employee.getFirstName() + " "+employee.getLastName()))
+                .filter(employee -> (employee.getFirstName()+" "+employee.getLastName()).toLowerCase().startsWith(name.toLowerCase()))
                 .collect(Collectors.toList());
 
         List<EmployeeDTO> employeesByName=new LinkedList<>();
@@ -180,7 +177,6 @@ public class CompanyService {
     @Transactional
     public Set<EmployeeDTO> getEmployeesSortedByDate(Integer id,Integer pageNumber,Integer pageSize)
     {
-        Company company=companyRepository.findById(id).get();
         Set<EmployeeDTO> employeeDTOS=new LinkedHashSet<>();
         List<Employee> employee=employeeRepository.findAll();
         LinkedHashSet<Employee> employeeSorted= employee.stream().filter(p->{ return p.getCompanyId()==id;}).collect(Collectors.toCollection(LinkedHashSet::new));
@@ -290,6 +286,7 @@ public class CompanyService {
         employeeDTO.setCapturedImage(employee.getCapturedImage());
         employeeDTO.setDocumentType(employee.getDocumentType());
         employeeDTO.setStatus(employee.getStatus());
+        employeeDTO.setGender(employee.getGender());
         return  employeeDTO;
     }
     private String generateUsername(Employee employee) {

@@ -27,6 +27,7 @@ public class EmployeeDTO {
     private Address address;
     private  Integer companyId;
     private byte[] capturedImage;
+    private String gender;
 
 
 }

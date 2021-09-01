@@ -226,6 +226,7 @@ public class AdminService {
         employeeDTO.setDocumentType(employee.getDocumentType());
         employeeDTO.setStatus(employee.getStatus());
         employeeDTO.setCapturedImage(employee.getCapturedImage());
+        employeeDTO.setGender(employee.getGender());
         //  employeeDTO.setCapturedImage(employee.getCapturedImage());
         return employeeDTO;
     }
@@ -264,16 +265,12 @@ public class AdminService {
         if (employeebyname.isEmpty()) {
             return employeeDTOS;
         }
-        System.out.println("before emlpo");
 
         for(Employee employee:employeebyname)
         {
             System.out.println(employee);
             employeeList.add(employee);
         }
-
-        System.out.println("after emlpo");
-
         for(Employee employee:this.getEmployeePagination(pageNumber,pageSize,employeeList))
         {
             System.out.println("1  " + employee);

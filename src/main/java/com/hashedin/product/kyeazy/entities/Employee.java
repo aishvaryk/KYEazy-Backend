@@ -43,6 +43,9 @@ public class Employee {
     @Column(name="email_id")
     private String emailID;
 
+    @Column(name="gender")
+    private String gender;
+
     @Lob
     @Column(name="captured_image")
     private byte[] capturedImage;

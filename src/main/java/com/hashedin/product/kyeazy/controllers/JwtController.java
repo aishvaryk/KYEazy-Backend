@@ -38,6 +38,7 @@ public class JwtController {
     @RequestMapping(value="/token",method = RequestMethod.POST)
     public ResponseEntity<?> generateToken(@RequestBody JwtRequest jwtRequest) throws Exception
     {
+        int userId=0;
         System.out.println(jwtRequest.getRole());
         String username="";
         if(jwtRequest.getRole().equals("ADMIN"))
@@ -52,7 +53,7 @@ public class JwtController {
             Company company =companyService.getCompanyByUsername(jwtRequest.getUsername());
             if(company==null) throw new Exception("Wrong Username!");
             if(! (company.getPassword().equals(jwtRequest.getPassword()))) throw new Exception("Invalid Credentials!");
-
+            userId=company.getCompanyId();
             username+="C"+jwtRequest.getUsername();
             System.out.println("usernaeme"+username);
         }
@@ -61,6 +62,7 @@ public class JwtController {
 
             Employee employee =employeeService.getEmployeeByUsername(jwtRequest.getUsername());
             if(employee==null) throw new Exception("Wrong Username!");
+            userId=employee.getEmployeeId();
             System.out.println(jwtRequest.getPassword());
             if(! (employee.getPassword().equals(jwtRequest.getPassword()))) throw new Exception("Invalid Credentials!");
             username+="E"+jwtRequest.getUsername();
@@ -80,7 +82,7 @@ public class JwtController {
         UserDetails userDetails=this.customUserDetailsService.loadUserByUsername(username);
         String token=this.jwtUtil.generateToken(userDetails);
         System.out.println(token);
-        return ResponseEntity.ok(new JwtResponse(token));
+        return ResponseEntity.ok(new JwtResponse(token,userId));
     }
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleException(Exception exc) {

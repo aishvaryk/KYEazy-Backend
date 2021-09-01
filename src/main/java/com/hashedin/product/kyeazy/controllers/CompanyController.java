@@ -43,7 +43,7 @@ public class CompanyController {
     }
 
     @PostMapping(value = "/register")
-    public ActionDTO register(@RequestBody Company company) {
+    public CompanyDTO register(@RequestBody Company company) {
         return companyService.register(company);
     }
 
@@ -96,6 +96,7 @@ public class CompanyController {
         return companyService.getEmployeesWithPendingKYC(id,pageNumber,pageSize);
     }
 */
+
     @GetMapping ("/get-registered-employees/{id}")
     public Set<EmployeeDTO> getRegisteredEmployees(@PathVariable Integer id,@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
         return companyService.getRegisteredEmployees(id,pageNumber,pageSize);
@@ -106,7 +107,6 @@ public class CompanyController {
         return companyService.getEmployeesWithRejectedKYC(id,pageNumber,pageSize);
     }
 */
-
 
     @GetMapping ("/get-employees-by-date-of-application/{date}")
     public Set<EmployeeDTO> getEmployeesByDateOfApplication(@PathVariable String date,@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
