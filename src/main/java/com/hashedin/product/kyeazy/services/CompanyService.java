@@ -38,6 +38,16 @@ public class CompanyService {
         this.employeeRepository=employeeRepository;
     }
 
+    public  Company getCompanyByUsername(String userName) {
+        List<Company> companies=companyRepository.findAll();
+        for(Company companyToCheck:companies) {
+            if(companyToCheck.getUsername().equals(userName)) return companyToCheck;
+
+        }
+        return null;
+    }
+
+
     public ActionDTO register(Company company) {
 
         //company uniqueness check

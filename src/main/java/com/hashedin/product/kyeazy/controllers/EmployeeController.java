@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/employee")
 public class EmployeeController {
@@ -44,6 +44,8 @@ public class EmployeeController {
     @PatchMapping("/update-profile")
     public ActionDTO updateProfile(@RequestBody  Employee employee)
     {
+        System.out.println(employee.getEmployeeId());
+        System.out.println(employee.getEmailID());
         return  employeeService.updateProfileData(employee);
     }
     @GetMapping("/view-profile/{employeeId}")

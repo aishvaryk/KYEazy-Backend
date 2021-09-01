@@ -1,6 +1,7 @@
 package com.hashedin.product.kyeazy.services;
 
 import com.hashedin.product.kyeazy.dto.ActionDTO;
+import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 @Service
 public class EmployeeService {
@@ -40,8 +42,10 @@ public class EmployeeService {
 
     public ActionDTO updateEmployeeVideo(Integer employeeId, MultipartFile profileVideo) throws IOException
     {
-       // System.out.println("Current folder: " + (new File(".")).getCanonicalPath());
+       //System.out.println("Current folder: " + (new File(".")).getCanonicalPath());
+        //ClassLoader classLoader = getClass().getClassLoader();
         Employee employee=this.getEmployeeData(employeeId);
+        //File file = new File(classLoader.getResource(".").getFile() + "summary.txt");
         String uploadDir="src/main/resources/employee_videos";
         Path uploadPath = Paths.get(uploadDir);
 
@@ -67,5 +71,19 @@ public class EmployeeService {
 
         return employeeRepository.findById(employeeId).get();
 
+    }
+
+    @Transactional
+    public Employee getEmployeeByUsername(String userName) {
+        List<Employee> employees=employeeRepository.findAll();
+        for(Employee employeeToCheck:employees) {
+            if(employeeToCheck.getUsername().equals(userName))
+            {
+                System.out.println(",Milllaaa"+employeeToCheck);
+                return employeeToCheck;
+            }
+
+        }
+        return null;
     }
 }
