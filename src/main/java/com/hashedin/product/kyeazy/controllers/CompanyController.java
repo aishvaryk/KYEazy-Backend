@@ -11,8 +11,12 @@ import com.hashedin.product.kyeazy.exceptions.response.ExceptionResponse;
 import com.hashedin.product.kyeazy.services.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -39,8 +43,14 @@ public class CompanyController {
     }
 
     @PostMapping(value = "/register")
-    public ActionDTO register(@RequestBody Company company) {
+    public CompanyDTO register(@RequestBody Company company) {
         return companyService.register(company);
+    }
+
+    @PostMapping(value="/register-employees/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ActionDTO registerEmployees(@PathVariable Integer id, @RequestParam("employeeCSV") MultipartFile employeeVideo) throws IOException
+    {
+        return  companyService.registerEmployees(id,employeeVideo);
     }
 
     @PostMapping(value = "/register-employee/{companyId}")
@@ -77,7 +87,7 @@ public class CompanyController {
 
 
     @GetMapping("/get-employees-by-name/{id}/{name}")
-    public EmployeeDTO getEmployeeByName(@PathVariable Integer id, @PathVariable String name) {
+    public List<EmployeeDTO> getEmployeeByName(@PathVariable Integer id, @PathVariable String name) {
         return companyService.getEmployeeByName(id,name);
     }
 /*
@@ -86,6 +96,7 @@ public class CompanyController {
         return companyService.getEmployeesWithPendingKYC(id,pageNumber,pageSize);
     }
 */
+
     @GetMapping ("/get-registered-employees/{id}")
     public Set<EmployeeDTO> getRegisteredEmployees(@PathVariable Integer id,@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
         return companyService.getRegisteredEmployees(id,pageNumber,pageSize);
@@ -96,7 +107,6 @@ public class CompanyController {
         return companyService.getEmployeesWithRejectedKYC(id,pageNumber,pageSize);
     }
 */
-
 
     @GetMapping ("/get-employees-by-date-of-application/{date}")
     public Set<EmployeeDTO> getEmployeesByDateOfApplication(@PathVariable String date,@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
@@ -126,6 +136,15 @@ public class CompanyController {
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleException(DataNotFoundException exc) {
+        ExceptionResponse error = new ExceptionResponse();
+        error.setStatus(HttpStatus.LENGTH_REQUIRED.value());
+        error.setMessage(exc.getMessage());
+        error.setTimeStamp(System.currentTimeMillis());
+        return new ResponseEntity<>(error, HttpStatus.LENGTH_REQUIRED);
+
+    }
+    @ExceptionHandler
+    public ResponseEntity<ExceptionResponse> handleException(Exception exc) {
         ExceptionResponse error = new ExceptionResponse();
         error.setStatus(HttpStatus.LENGTH_REQUIRED.value());
         error.setMessage(exc.getMessage());

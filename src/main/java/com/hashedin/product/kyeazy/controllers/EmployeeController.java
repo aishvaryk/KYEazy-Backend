@@ -7,9 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
 import java.io.IOException;
 
-@CrossOrigin
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/employee")
 public class EmployeeController {
@@ -40,15 +42,27 @@ public class EmployeeController {
     {
         return  employeeService.updateEmployeeVideo(id,employeeVideo);
     }
+    @PatchMapping(value="/update-video/{id}/document",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ActionDTO updateDocument(@PathVariable Integer id, @RequestParam("employeeDocument") MultipartFile employeeVideo) throws IOException
+    {
+        return  employeeService.updateEmployeeDocument(id,employeeVideo);
+    }
 
     @PatchMapping("/update-profile")
     public ActionDTO updateProfile(@RequestBody  Employee employee)
     {
+        System.out.println(employee.getEmployeeId());
+        System.out.println(employee.getEmailID());
         return  employeeService.updateProfileData(employee);
     }
     @GetMapping("/view-profile/{employeeId}")
     public Employee viewProfile(@PathVariable Integer employeeId)
     {
         return  employeeService.getEmployeeData(employeeId);
+    }
+    @GetMapping("/get-employee-video/{employeeId}")
+    public File getEmployeeVideo(@PathVariable Integer employeeId)
+    {
+        return  null;
     }
 }
