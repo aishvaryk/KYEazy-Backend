@@ -2,7 +2,7 @@ spring:
   datasource:
     url: "jdbc:postgresql://10.111.193.3:5432/kyc"
     username: "kyc"
-    password: "Root@123"
+    password: "${DBN}"
     driverClassName: "org.postgresql.Driver"
 
   jpa:
