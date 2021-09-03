@@ -15,5 +15,5 @@ deploy:
   - gcloud config set project hu18-groupb-java
   - cd
   - cd $CI_PROJECT_DIR
-  - gcloud builds submit . --config=cloudbuild.yaml --substitutions=TAG_NAME=${GITLAB_USER_LOGIN}
+  - gcloud builds submit . --config=cloudbuild.yaml --substitutions=TAG_NAME=${CI_COMMIT_BRANCH}
   #- gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=${GITLAB_USER_

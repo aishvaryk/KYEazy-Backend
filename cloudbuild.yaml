@@ -1,13 +1,13 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'build', '-t', 'asia.gcr.io/$PROJECT_ID/$TAG_NAME', '.' ]
+  args: [ 'build', '-t', 'asia.gcr.io/$PROJECT_ID/kyc', '.' ]
 # - name: 'gcr.io/kaniko-project/executor:latest'
 #   args:
 #   - --destination=asia.gcr.io/$PROJECT_ID/$TAG_NAME
 #   - --cache=true
 #   - --cache-ttl=6h  
 - name: 'gcr.io/cloud-builders/docker'
-  args: [ 'push', 'asia.gcr.io/$PROJECT_ID/$TAG_NAME']
+  args: [ 'push', 'asia.gcr.io/$PROJECT_ID/kyc']
 - name: "gcr.io/cloud-builders/gcloud"
-  args: ['run', 'deploy', 'kycbackend','--max-instances', '3', '--memory', '512Mi', '--image', 'asia.gcr.io/$PROJECT_ID/$TAG_NAME', '--region', 'asia-south1', '--platform', 'managed', '--allow-unauthenticated', '--vpc-connector', 'django', '--add-cloudsql-instances', 'hucicd1nik', '--set-env-vars', 'DBN=$TAG_NAME']
+  args: ['run', 'deploy', 'kycbackend','--max-instances', '3', '--memory', '512Mi', '--image', 'asia.gcr.io/$PROJECT_ID/kyc', '--region', 'asia-south1', '--platform', 'managed', '--allow-unauthenticated', '--vpc-connector', 'django', '--add-cloudsql-instances', 'hucicd1nik', '--set-env-vars', 'DBN=$TAG_NAME']
 logsBucket: 'gs://hu18-groupb-java_cloudbuild'
