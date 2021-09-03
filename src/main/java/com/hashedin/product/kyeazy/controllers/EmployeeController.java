@@ -24,7 +24,7 @@ public class EmployeeController {
         return  employeeService.updateProfileData(employee);
     }
 
-    @PatchMapping(value="/update-profile/captured-image/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value="/update-captured-image/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
     public ActionDTO updateCapturedImage(@PathVariable Integer id, @RequestParam("profilePicture") MultipartFile profilePicture) throws IOException
     {
         return  employeeService.updateEmployeeImage(id,profilePicture);

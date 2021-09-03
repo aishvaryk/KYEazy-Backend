@@ -81,6 +81,7 @@ public class CompanyController {
     public ActionDTO reportEmployee(@PathVariable Integer id, @RequestBody String message) {
         return companyService.reportEmployee(id,message);
     }
+
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleException(DataAlreadyExistsException exc) {
         ExceptionResponse error = new ExceptionResponse();

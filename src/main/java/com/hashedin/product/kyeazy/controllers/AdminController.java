@@ -77,7 +77,7 @@ public class AdminController {
     {
         return adminService.getVideo(username);
     }
-    @RequestMapping("/get-document/{document}")
+    @RequestMapping("/get-document/{username}")
     public ResponseEntity<byte[]> getDocument(@PathVariable String username) throws IOException
     {
         return adminService.getDocument(username);
@@ -92,21 +92,25 @@ public class AdminController {
     {
         return adminService.getTotalNumberOfRejectEmployees();
     }
+
     @GetMapping("/get-number-of-accepted-employee")
     public Integer getTotalNumberOfAcceptedEmployees()
     {
         return adminService.getTotalNumberOfAcceptedEmployees();
     }
+
     @GetMapping("/get-number-of-pending-employee")
     public Integer getTotalNumberOfPendingEmployees()
     {
         return adminService.getTotalNumberOfPendingEmployees();
     }
+
     @GetMapping("/get-number-of-registered-employee")
     public Integer getTotalNumberOfRegisteredEmployees()
     {
         return adminService.getTotalNumberOfRegisteredEmployees();
     }
+
     @GetMapping("/employees-by-status/{companyId}/{status}")
     public List<EmployeeDTO> getEmployeesByStatus(@PathVariable Integer companyId, @PathVariable String status,@RequestParam Integer pageNumber,@RequestParam Integer pageSize) {
         return adminService.getEmployeesByStatus(companyId, status,pageNumber,pageSize);

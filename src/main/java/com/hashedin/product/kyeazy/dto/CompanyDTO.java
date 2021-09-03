@@ -21,6 +21,10 @@ public class CompanyDTO {
     private  String address;
     private  byte[] icon;
     private List<EmployeeDTO> employees;
+    private Integer numberOfPendingEmployees;
+    private Integer numberOfAcceptedEmployees;
+    private Integer numberOfRejectedEmployees;
+    private Integer numberOfTotalEmployees;
 
 
 }
