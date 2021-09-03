@@ -67,6 +67,35 @@ public class AdminController {
     }
 
 
+    @GetMapping("/get-number-of-employee")
+    public Integer getTotalNumberOfEmployees()
+    {
+        return adminService.getTotalNumberOfEmployees();
+    }
+
+    @GetMapping("/get-number-of-rejected-employee")
+    public Integer getTotalNumberOfRejectEmployees()
+    {
+        return adminService.getTotalNumberOfRejectEmployees();
+    }
+
+    @GetMapping("/get-number-of-accepted-employee")
+    public Integer getTotalNumberOfAcceptedEmployees()
+    {
+        return adminService.getTotalNumberOfAcceptedEmployees();
+    }
+
+    @GetMapping("/get-number-of-pending-employee")
+    public Integer getTotalNumberOfPendingEmployees()
+    {
+        return adminService.getTotalNumberOfPendingEmployees();
+    }
+
+    @GetMapping("/get-number-of-registered-employee")
+    public Integer getTotalNumberOfRegisteredEmployees()
+    {
+        return adminService.getTotalNumberOfRegisteredEmployees();
+    }
 
 
     @RequestMapping("/view-employee-details/{id}")

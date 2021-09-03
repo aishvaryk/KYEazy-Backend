@@ -10,6 +10,9 @@ import com.hashedin.product.kyeazy.repositories.CompanyRepository;
 import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
 import jdk.dynalink.linker.GuardingDynamicLinkerExporter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import javax.transaction.Transactional;
@@ -143,15 +146,15 @@ public class CompanyService {
         Company company=getCompanyById(id);
         return parseCompany(company);
     }
-@Transactional
+
+    @Transactional
     public List<EmployeeDTO> getEmployeeByName(Integer companyId,String name) {
         Company company = getCompanyById(companyId);
         Set<Employee> employeeList = company.getEmployees();
-    System.out.println(name);
+        System.out.println(name);
         List<Employee> employeebyname= employeeList.stream()
                 .filter(employee -> (employee.getFirstName()+" "+employee.getLastName()).toLowerCase().startsWith(name.toLowerCase()))
                 .collect(Collectors.toList());
-
         List<EmployeeDTO> employeesByName=new LinkedList<>();
         for(Employee e:employeebyname)
         {
@@ -159,13 +162,14 @@ public class CompanyService {
         }
         return employeesByName;
     }
+
     @Transactional
     public Set<EmployeeDTO> getEmployeesSortedByName(Integer id,Integer pageNumber,Integer pageSize)
     {
         Set<EmployeeDTO> employeeDTOS=new LinkedHashSet<>();
         List<Employee> employee=employeeRepository.findAll();
         LinkedHashSet<Employee> employeeSorted= employee.stream().filter(p->{ return p.getCompanyId()==id;}).collect(Collectors.toCollection(LinkedHashSet::new));
-//    {   Company company=companyRepository.findById(id).get();
+        //    {   Company company=companyRepository.findById(id).get();
 
         for(Employee e:getSortedEmployeePagination(pageNumber,pageSize,employeeSorted,"name"))
         {

@@ -324,6 +324,31 @@ public class AdminService {
         return  new ResponseEntity<byte[]>(bytes,headers, HttpStatus.OK);
 
     }
+
+    @Transactional
+    public int getTotalNumberOfEmployees(){
+        return employeeRepository.findAll().size();
+    }
+
+    @Transactional
+    public int getTotalNumberOfAcceptedEmployees(){
+        return employeeRepository.findAllEmployeesByStatus("Accepted").size();
+    }
+    @Transactional
+    public int getTotalNumberOfPendingEmployees(){
+        return employeeRepository.findAllEmployeesByStatus("Pending").size();
+    }
+
+    @Transactional
+    public int getTotalNumberOfRegisteredEmployees(){
+        return employeeRepository.findAllEmployeesByStatus("Registered").size();
+    }
+
+    @Transactional
+    public int getTotalNumberOfRejectEmployees(){
+        return employeeRepository.findAllEmployeesByStatus("Rejected").size();
+    }
+
     private List<Employee> getSortedAllEmployeePagination(Integer pageNumber,Integer pageSize,Set<Employee> employees,
                                                           String parameter) {
         Integer lastIndex=employees.size();
