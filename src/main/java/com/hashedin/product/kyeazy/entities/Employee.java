@@ -31,6 +31,13 @@ public class Employee {
     @Column(name="last_name")
     private String lastName;
 
+    @Column(name="display_name")
+    private String displayName;
+
+    @Column(name="review")
+    private String review;
+
+
     @Column(name="contact_number")
     private String contactNumber;
 

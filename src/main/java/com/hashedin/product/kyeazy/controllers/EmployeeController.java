@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -19,50 +18,40 @@ public class EmployeeController {
     @Autowired
     EmployeeService employeeService;
 
-    @RequestMapping("/login")
-    public ActionDTO login()
+    @PatchMapping("/update-profile")
+    public ActionDTO updateProfile(@RequestBody Employee employee)
     {
-        return null;
+        return  employeeService.updateProfileData(employee);
     }
 
-    @RequestMapping("/logout")
-    public ActionDTO logout()
-    {
-        return null;
-    }
-
-    @PatchMapping(value="/update-profile/{id}/profile-pictures",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ActionDTO updateProfileImage(@PathVariable Integer id, @RequestParam("profilePicture") MultipartFile profilePicture) throws IOException
+    @PatchMapping(value="/update-profile/captured-image/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ActionDTO updateCapturedImage(@PathVariable Integer id, @RequestParam("profilePicture") MultipartFile profilePicture) throws IOException
     {
         return  employeeService.updateEmployeeImage(id,profilePicture);
     }
 
-    @PatchMapping(value="/update-video/{id}/video",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value="/update-video/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
     public ActionDTO updateVideo(@PathVariable Integer id, @RequestParam("employeeVideo") MultipartFile employeeVideo) throws IOException
     {
         return  employeeService.updateEmployeeVideo(id,employeeVideo);
     }
-    @PatchMapping(value="/update-document/{id}/document",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+
+    @PatchMapping(value="/update-document/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
     public ActionDTO updateDocument(@PathVariable Integer id, @RequestParam("employeeDocument") MultipartFile employeeVideo) throws IOException
     {
         return  employeeService.updateEmployeeDocument(id,employeeVideo);
     }
 
-    @PatchMapping("/update-profile")
-    public ActionDTO updateProfile(@RequestBody  Employee employee)
+    @PatchMapping(value="/update-status/{id}")
+    public ActionDTO updateStatus(@PathVariable Integer id)
     {
-        System.out.println(employee.getEmployeeId());
-        System.out.println(employee.getEmailID());
-        return  employeeService.updateProfileData(employee);
+        return  employeeService.updateEmployeeStatus(id);
     }
+
     @GetMapping("/view-profile/{employeeId}")
     public Employee viewProfile(@PathVariable Integer employeeId)
     {
         return  employeeService.getEmployeeData(employeeId);
     }
-    @GetMapping("/get-employee-video/{employeeId}")
-    public File getEmployeeVideo(@PathVariable Integer employeeId)
-    {
-        return  null;
-    }
+
 }

@@ -35,10 +35,10 @@ public class Company {
     @OneToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="addressId")
     private  Address address;
-/*
-    @OneToMany(mappedBy = "company")
-    private Set<Employee> employees = new HashSet<>();
-*/
+
+    @Lob
+    @Column(name="icon")
+    private byte[] icon;
 
     @OneToMany(cascade=CascadeType.ALL)
     @JoinColumn(name="company_id",referencedColumnName ="company_id" )
