@@ -5,7 +5,7 @@ import com.hashedin.product.kyeazy.dto.CompanyDTO;
 import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
-import com.hashedin.product.kyeazy.exceptions.DataNotFoundException;
+import com.hashedin.product.kyeazy.exceptions.DataAlreadyExistsException;
 import com.hashedin.product.kyeazy.exceptions.RequiredFieldException;
 import com.hashedin.product.kyeazy.exceptions.response.ExceptionResponse;
 import com.hashedin.product.kyeazy.services.CompanyService;
@@ -32,25 +32,14 @@ public class CompanyController {
         this.companyService = companyService;
     }
 
-    @RequestMapping("/login")
-    public ActionDTO login() {
-        return null;
-    }
-
-    @RequestMapping("/logout")
-    public ActionDTO logout() {
-        return null;
-    }
-
     @PostMapping(value = "/register")
     public CompanyDTO register(@RequestBody Company company) {
         return companyService.register(company);
     }
 
-    @PostMapping(value="/register-employees/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ActionDTO registerEmployees(@PathVariable Integer id, @RequestParam("employeeCSV") MultipartFile employeeVideo) throws IOException
-    {
-        return  companyService.registerEmployees(id,employeeVideo);
+    @PostMapping(value = "/register-employees/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ActionDTO registerEmployees(@PathVariable Integer id, @RequestParam("employeeCSV") MultipartFile employeeVideo) throws IOException {
+        return companyService.registerEmployees(id, employeeVideo);
     }
 
     @PostMapping(value = "/register-employee/{companyId}")
@@ -58,16 +47,15 @@ public class CompanyController {
         return this.companyService.registerEmployee(employee, companyId);
     }
 
-
     @GetMapping("/employees/{companyId}")
-    public List<EmployeeDTO> getEmployees(@PathVariable Integer companyId,@RequestParam Integer pageNumber,@RequestParam Integer pageSize) {
-        return companyService.getEmployees(companyId,pageNumber,pageSize);
+    public List<EmployeeDTO> getEmployees(@PathVariable Integer companyId, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
+        return companyService.getEmployees(companyId, pageNumber, pageSize);
     }
 
     //error
     @GetMapping("/employees-by-status/{companyId}/{status}")
-    public Set<EmployeeDTO> getEmployeesByStatus(@PathVariable Integer companyId, @PathVariable String status,@RequestParam Integer pageNumber,@RequestParam Integer pageSize) {
-        return companyService.getEmployeesByStatus(companyId, status,pageNumber,pageSize);
+    public List<EmployeeDTO> getEmployeesByStatus(@PathVariable Integer companyId, @PathVariable String status, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
+        return companyService.getEmployeesByStatus(companyId, status, pageNumber, pageSize);
     }
 
     @GetMapping("/get-company-details/{id}")
@@ -76,66 +64,25 @@ public class CompanyController {
     }
 
     @GetMapping("/get-employees-sorted-by-name/{id}")
-    public Set<EmployeeDTO> getEmployeesSortedByName(@PathVariable Integer id,@RequestParam Integer pageNumber,@RequestParam Integer pageSize) {
-        return companyService.getEmployeesSortedByName(id,pageNumber,pageSize);
+    public List<EmployeeDTO> getEmployeesSortedByName(@PathVariable Integer id, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
+        return companyService.getEmployeesSortedByName(id, pageNumber, pageSize);
     }
 
     @GetMapping("/get-employees-sorted-by-date/{id}")
-    public Set<EmployeeDTO> getEmployeesSortedByDate(@PathVariable Integer id,@RequestParam Integer pageNumber,@RequestParam Integer pageSize) {
-        return companyService.getEmployeesSortedByDate(id,pageNumber,pageSize);
+    public List<EmployeeDTO> getEmployeesSortedByDate(@PathVariable Integer id, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
+        return companyService.getEmployeesSortedByDate(id, pageNumber, pageSize);
     }
-
 
     @GetMapping("/get-employees-by-name/{id}/{name}")
-    public List<EmployeeDTO> getEmployeeByName(@PathVariable Integer id, @PathVariable String name) {
-        return companyService.getEmployeeByName(id,name);
+    public List<EmployeeDTO> getEmployeeByName(@PathVariable Integer id, @PathVariable String name, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
+        return companyService.getEmployeeByName(id, name, pageNumber, pageSize);
     }
-/*
-    @GetMapping ("/get-employees-with-pending-kyc/{id}")
-    public Set<EmployeeDTO> getEmployeesWithPendingKYC(@PathVariable Integer id,@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
-        return companyService.getEmployeesWithPendingKYC(id,pageNumber,pageSize);
+    @PostMapping("/report-employee/{id}")
+    public ActionDTO reportEmployee(@PathVariable Integer id, @RequestBody String message) {
+        return companyService.reportEmployee(id,message);
     }
-*/
-
-    @GetMapping ("/get-registered-employees/{id}")
-    public Set<EmployeeDTO> getRegisteredEmployees(@PathVariable Integer id,@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
-        return companyService.getRegisteredEmployees(id,pageNumber,pageSize);
-    }
-/*
-    @GetMapping ("/get-employees-with-rejected-kyc/{id}")
-    public Set<EmployeeDTO> getEmployeesWithRejectedKYC(@PathVariable Integer id,@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
-        return companyService.getEmployeesWithRejectedKYC(id,pageNumber,pageSize);
-    }
-*/
-
-    @GetMapping ("/get-employees-by-date-of-application/{date}")
-    public Set<EmployeeDTO> getEmployeesByDateOfApplication(@PathVariable String date,@RequestParam Integer pageNumber,@RequestParam Integer pageSize){
-        //Instant timestamp = null;
-        //LocalDateTime dateTime = LocalDateTime.parse("2018-05-05T11:50:55");
-        return companyService.getEmployeesByDateOfApplication(date,pageNumber,pageSize);
-    }
-
-    @RequestMapping("/profile")
-    public ActionDTO viewProfile() {
-        return null;
-    }
-
-    @PatchMapping("/update-profile")
-    public ActionDTO updateProfile(@RequestBody Company company) {
-        return companyService.updateCompanyProfile(company);
-    }
-
     @ExceptionHandler
-    public ResponseEntity<ExceptionResponse> handleException(RequiredFieldException exc) {
-        ExceptionResponse error = new ExceptionResponse();
-        error.setStatus(HttpStatus.LENGTH_REQUIRED.value());
-        error.setMessage(exc.getMessage());
-        error.setTimeStamp(System.currentTimeMillis());
-        return new ResponseEntity<>(error, HttpStatus.LENGTH_REQUIRED);
-    }
-
-    @ExceptionHandler
-    public ResponseEntity<ExceptionResponse> handleException(DataNotFoundException exc) {
+    public ResponseEntity<ExceptionResponse> handleException(DataAlreadyExistsException exc) {
         ExceptionResponse error = new ExceptionResponse();
         error.setStatus(HttpStatus.LENGTH_REQUIRED.value());
         error.setMessage(exc.getMessage());
@@ -143,6 +90,7 @@ public class CompanyController {
         return new ResponseEntity<>(error, HttpStatus.LENGTH_REQUIRED);
 
     }
+
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleException(Exception exc) {
         ExceptionResponse error = new ExceptionResponse();

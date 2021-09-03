@@ -25,20 +25,25 @@ public class MySecurityConfig extends WebSecurityConfigurerAdapter {
     private JwtAuthenticationFilter jwtFilter;
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .csrf()
                 .disable()
                 .cors().and()
-               .authorizeRequests()
-                .antMatchers("/token","/company/register").permitAll()
-                //.antMatchers("/company/register").permitAll()
-
+                .authorizeRequests()
+                .antMatchers(
+                        "/token",
+                        "/company/register",
+                        "/swagger-ui.html",
+                        "/webjars/**",
+                        "/swagger-resources/**",
+                        "/v2/api-docs").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-    http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     //override
@@ -49,15 +54,14 @@ public class MySecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder()
-    {
+    public PasswordEncoder passwordEncoder() {
         return NoOpPasswordEncoder.getInstance();
-       // return new BCryptPasswordEncoder();
+        // return new BCryptPasswordEncoder();
     }
+
     @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception
-    {
-        return  super.authenticationManagerBean();
+    public AuthenticationManager authenticationManagerBean() throws Exception {
+        return super.authenticationManagerBean();
     }
 
 }

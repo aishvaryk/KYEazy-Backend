@@ -1,17 +1,21 @@
 package com.hashedin.product.kyeazy.services;
+
 import com.hashedin.product.kyeazy.dto.ActionDTO;
 import com.hashedin.product.kyeazy.dto.CompanyDTO;
 import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
-import com.hashedin.product.kyeazy.exceptions.DataNotFoundException;
+import com.hashedin.product.kyeazy.exceptions.DataAlreadyExistsException;
 import com.hashedin.product.kyeazy.exceptions.RequiredFieldException;
 import com.hashedin.product.kyeazy.repositories.CompanyRepository;
 import com.hashedin.product.kyeazy.repositories.EmployeeRepository;
-import jdk.dynalink.linker.GuardingDynamicLinkerExporter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 import javax.transaction.Transactional;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,247 +34,149 @@ public class CompanyService {
     @Autowired
     public CompanyService(CompanyRepository companyRepository, EmailSender emailSender, EmployeeRepository employeeRepository) {
         this.companyRepository = companyRepository;
-        this.emailSender=emailSender;
-        this.employeeRepository=employeeRepository;
+        this.emailSender = emailSender;
+        this.employeeRepository = employeeRepository;
     }
 
-    public  Company getCompanyByUsername(String userName) {
-        List<Company> companies=companyRepository.findAll();
-        for(Company companyToCheck:companies) {
-            if(companyToCheck.getUsername().equals(userName)) return companyToCheck;
+    public Company getCompanyByUsername(String userName) {
+        List<Company> companies = companyRepository.findAll();
+        for (Company companyToCheck : companies) {
+            if (companyToCheck.getUsername().equals(userName)) return companyToCheck;
 
         }
         return null;
     }
 
-
     public CompanyDTO register(Company company) {
 
-        //company uniqueness check
-
-        List<Company> companies=companyRepository.findAll();
-        for(Company companyToCheck:companies)
-        {
-            if(companyToCheck.getUsername().equals(company.getUsername()))throw new DataNotFoundException("The Username is already registered !!!!!");
-            if(companyToCheck.getCinNumber().equalsIgnoreCase(company.getCinNumber()))throw new DataNotFoundException("The Company is already registered !!!!!");
+        List<Company> companies = companyRepository.findAll();
+        for (Company companyToCheck : companies) {
+            if (companyToCheck.getUsername().equals(company.getUsername()))
+                throw new DataAlreadyExistsException("The Username is already registered !!!!!");
+            if (companyToCheck.getCinNumber().equalsIgnoreCase(company.getCinNumber()))
+                throw new DataAlreadyExistsException("The Company is already registered !!!!!");
         }
-//        if (company.getName() == null || company.getName().length() == 0) {
-//            throw new RequiredFieldException("Company name can't be empty.");
-//        }
-//
-//        if (company.getCompanyDescription() == null || company.getCompanyDescription().length() == 0) {
-//            throw new RequiredFieldException("Company Description can't be empty.");
-//        }
         Company addedCompany = companyRepository.save(company);
 
         return parseCompany(addedCompany);
     }
 
-    public ActionDTO registerEmployee(Employee employee,int companyId) {
+    public ActionDTO registerEmployee(Employee employee, int companyId) throws DataAlreadyExistsException {
 
-        List<Employee> employees=employeeRepository.findAll();
-        for(Employee employeeToCheck:employees)
-        {
-            if(employeeToCheck.getEmailID().equals(employee.getEmailID()) && employeeToCheck.getCompanyId()==companyId)throw new DataNotFoundException("The given is already registered with same company !!!!!");
+        List<Employee> employees = employeeRepository.findAll();
+        for (Employee employeeToCheck : employees) {
+            if (employeeToCheck.getEmailID().equals(employee.getEmailID()) && employeeToCheck.getCompanyId() == companyId)
+                throw new DataAlreadyExistsException("The given is already registered with same company !!!!!");
+            if (employeeToCheck.getEmailID().equals(employee.getEmailID()))
+            {
+                employeeToCheck.setCompanyId(companyId);
+                return null ;
+            }
+
         }
-
         String username = this.generateUsername(employee);
         String passkey = String.valueOf(this.generatePassword(employee));
-
-        String link="http://localhost:8085/employee/login";
-        String mailBody="Hey "+employee.getFirstName()+","+"Your Id password for doing kyc is  Username: "+username+" Password:" +passkey +" Link:" +link;
-        //this.emailSender.sendMail(employee.getEmailID(),"Regarding KYC",mailBody);
-
+        String link = "https://kycfront-amxbp6pvia-as.a.run.app/";
+        String mailBody = "Hey " + employee.getFirstName() + "," + "Your Id password for doing kyc is  Username: " + username + " Password:" + passkey + " Link:" + link;
+        this.emailSender.sendMail(employee.getEmailID(), "Regarding KYC", mailBody);
         employee.setUsername(username);
         employee.setPassword(passkey);
-
         employee.setStatus("Registered");
         employee.setDateTimeOfApplication(new Date());
         employee.setCompanyId(companyId);
         Employee addedEmployee = employeeRepository.save(employee);
         return new ActionDTO(addedEmployee.getEmployeeId(), true, "Employee KYC Under Progress Wait for 2-3 days");
     }
+
     @Transactional
-    public List<EmployeeDTO> getEmployees(Integer id,Integer pageNumber,Integer pageSize)
-    {
-        Company company= getCompanyById(id);
-
-        List<EmployeeDTO> employeeDTOS=new LinkedList<>();
-
-        for(Employee employee:this.getEmployeePagination(pageNumber,pageSize,company.getEmployees()))
-        {
+    public List<EmployeeDTO> getEmployees(Integer id, Integer pageNumber, Integer pageSize) {
+        pageNumber--;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        List<EmployeeDTO> employeeDTOS = new LinkedList<>();
+        for (Employee employee : employeeRepository.findAllByCompanyId(id, pageable)) {
             employeeDTOS.add(parseEmployee(employee));
         }
-
-        return  employeeDTOS;
-    }
-
-
-    @Transactional
-    public Set<EmployeeDTO> getEmployeesByStatus(Integer companyId, String status,Integer pageNumber,Integer pageSize){
-        Set<EmployeeDTO> employeeDTOS=new HashSet<>();
-        Company company= getCompanyById(companyId);
-        Set<Employee> employeesByStatus=company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase(status);}).collect(Collectors.toSet());
-        if(employeesByStatus.isEmpty())
-            return employeeDTOS;
-        for(Employee e:this.getEmployeePagination(pageNumber,pageSize,employeesByStatus))
-        {
-            employeeDTOS.add(parseEmployee(e));
-        }
-
-        return  employeeDTOS;
-    }
-
-    public ActionDTO updateCompanyProfile(Company companyDetails)
-    {
-        Integer companyId=companyDetails.getCompanyId();
-        Optional<Company> companyIdToCheck =companyRepository.findById(companyId);
-
-        if(companyIdToCheck.isEmpty())  throw new RequiredFieldException("The given Company is not registered !!!!!");
-        Company company=companyIdToCheck.get();
-
-        if (companyDetails.getName() == null || companyDetails.getName().length() == 0) {
-            throw new RequiredFieldException("Company name can't be empty.");
-        }
-
-        Company companyUpdated= companyRepository.save(company);
-        return new ActionDTO(companyUpdated.getCompanyId(), true, "Company details Updated");
+        return employeeDTOS;
     }
 
     @Transactional
-    public CompanyDTO getCompanyDetails(Integer id)
-    {
-        Company company=getCompanyById(id);
+    public List<EmployeeDTO> getEmployeesByStatus(Integer companyId, String status, Integer pageNumber, Integer pageSize) {
+        pageNumber--;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("dateTimeOfApplication").descending());
+        List<EmployeeDTO> allEmployeeDTOS = new LinkedList<>();
+        for (Employee e : employeeRepository.findAllByStatusAndCompanyId(status, companyId, pageable)) {
+            allEmployeeDTOS.add(parseEmployee(e));
+        }
+        return allEmployeeDTOS;
+    }
+
+    @Transactional
+    public CompanyDTO getCompanyDetails(Integer id) {
+        Company company = getCompanyById(id);
         return parseCompany(company);
     }
-@Transactional
-    public List<EmployeeDTO> getEmployeeByName(Integer companyId,String name) {
-        Company company = getCompanyById(companyId);
-        Set<Employee> employeeList = company.getEmployees();
-    System.out.println(name);
-        List<Employee> employeebyname= employeeList.stream()
-                .filter(employee -> (employee.getFirstName()+" "+employee.getLastName()).toLowerCase().startsWith(name.toLowerCase()))
-                .collect(Collectors.toList());
-
-        List<EmployeeDTO> employeesByName=new LinkedList<>();
-        for(Employee e:employeebyname)
-        {
-          employeesByName.add(parseEmployee(e));
-        }
-        return employeesByName;
-    }
-    @Transactional
-    public Set<EmployeeDTO> getEmployeesSortedByName(Integer id,Integer pageNumber,Integer pageSize)
-    {
-        Set<EmployeeDTO> employeeDTOS=new LinkedHashSet<>();
-        List<Employee> employee=employeeRepository.findAll();
-        LinkedHashSet<Employee> employeeSorted= employee.stream().filter(p->{ return p.getCompanyId()==id;}).collect(Collectors.toCollection(LinkedHashSet::new));
-//    {   Company company=companyRepository.findById(id).get();
-
-        for(Employee e:getSortedEmployeePagination(pageNumber,pageSize,employeeSorted,"name"))
-        {
-            employeeDTOS.add(parseEmployee(e));
-        }
-        return employeeDTOS;
-    }
 
     @Transactional
-    public Set<EmployeeDTO> getEmployeesSortedByDate(Integer id,Integer pageNumber,Integer pageSize)
-    {
-        Set<EmployeeDTO> employeeDTOS=new LinkedHashSet<>();
-        List<Employee> employee=employeeRepository.findAll();
-        LinkedHashSet<Employee> employeeSorted= employee.stream().filter(p->{ return p.getCompanyId()==id;}).collect(Collectors.toCollection(LinkedHashSet::new));
-        for(Employee e:getSortedEmployeePagination(pageNumber,pageSize,employeeSorted,"date"))
-        {
-            employeeDTOS.add(parseEmployee(e));
-        }
-        return employeeDTOS;
-    }
-
-    @Transactional
-    public Set<EmployeeDTO> getRegisteredEmployees(Integer id,Integer pageNumber,Integer pageSize)
-    {   Set<EmployeeDTO> employeeDTOS=new HashSet<>();
-        Company company=getCompanyById(id);
-        Set<Employee> employee=company.getEmployees();
-        Set<Employee> registeredEmployees =company.getEmployees().stream().filter(p->{ return p.getStatus().equalsIgnoreCase("Registered");}).collect(Collectors.toSet());
-        for(Employee e:this.getEmployeePagination(pageNumber,pageSize,registeredEmployees))
-        {
-            employeeDTOS.add(parseEmployee(e));
-        }
-        return employeeDTOS;
-    }
-    @Transactional
-    public Set<EmployeeDTO> getEmployeesByDateOfApplication(String date,Integer pageNumber,Integer pageSize)
-    {
-        Set<EmployeeDTO> employeeDTOS=new HashSet<>();
-        List<Employee> employeeList=employeeRepository.findAll();
-       Set<Employee> employees=new HashSet<>();
-        for(Employee e:employeeList){
-            String s=e.getDateTimeOfApplication().toString();
-            if(s.equalsIgnoreCase(date))
-            {
-                employees.add(e);
-            }
-
-        }
-        for(Employee employee:this.getEmployeePagination(pageNumber,pageSize,employees))
-        {
+    public List<EmployeeDTO> getEmployeeByName(Integer companyId, String name, Integer pageNumber, Integer pageSize) {
+        pageNumber--;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        List<EmployeeDTO> employeeDTOS = new LinkedList<>();
+        for (Employee employee : employeeRepository.findAllByDisplayNameStartingWithAndCompanyId(name, companyId, pageable)) {
             employeeDTOS.add(parseEmployee(employee));
         }
         return employeeDTOS;
-    }
 
-    private List<Employee> getEmployeePagination(Integer pageNumber,Integer pageSize,Set<Employee> employees)
-    {
-
-        Integer lastIndex=employees.size();
-        Integer from=(pageNumber-1)*pageSize;
-        Integer to=from+pageSize;
-        if(from>employees.size()-1) return null;
-        if(to>lastIndex) to=lastIndex;
-        List<Employee> employeeList=new ArrayList<>();
-
-        employees.stream().sorted(Comparator.comparing(Employee::getEmployeeId)).forEach((p)->{
-            employeeList.add(p);
-                });
-
-        return employeeList.subList(from,to);
 
     }
 
-    private List<Employee> getSortedEmployeePagination(Integer pageNumber,Integer pageSize,Set<Employee> employees,
-                                                       String parameter )
-    {
-
-        Integer lastIndex=employees.size();
-        Integer from=(pageNumber-1)*pageSize;
-        Integer to=from+pageSize;
-        if(from>employees.size()-1) return null;
-        if(to>lastIndex) to=lastIndex;
-        List<Employee> employeeList=new ArrayList<>();
-        if(parameter.equalsIgnoreCase("name")) {
-            employees.stream().sorted(Comparator.comparing(Employee::getFirstName)).forEach((p) -> {
-                employeeList.add(p);
-            });
-        }
-        if(parameter.equalsIgnoreCase("date")) {
-            employees.stream().sorted(Comparator.comparing(Employee::getDateTimeOfApplication)).forEach((p) -> {
-                employeeList.add(p);
-            });
-        }
-
-        return employeeList.subList(from,to);
-
-    }
     @Transactional
-    private Company getCompanyById(Integer companyId)
+    public List<EmployeeDTO> getEmployeesSortedByName(Integer id, Integer pageNumber, Integer pageSize) {
+        List<EmployeeDTO> allEmployeeDTOS = new LinkedList<>();
+        pageNumber--;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("displayName"));
+
+        for (Employee e : employeeRepository.findAllByCompanyId(id, pageable)) {
+            allEmployeeDTOS.add(parseEmployee(e));
+        }
+        return allEmployeeDTOS;
+
+    }
+
+    @Transactional
+    public List<EmployeeDTO> getEmployeesSortedByDate(Integer id, Integer pageNumber, Integer pageSize) {
+        pageNumber--;
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("dateTimeOfApplication").descending());
+
+        List<EmployeeDTO> allEmployeeDTOS = new LinkedList<>();
+        for (Employee e : employeeRepository.findAllByCompanyId(id, pageable)) {
+            allEmployeeDTOS.add(parseEmployee(e));
+        }
+        return allEmployeeDTOS;
+
+    }
+    public ActionDTO updateCompanyImage(Integer companyId, MultipartFile icon) throws IOException
     {
+        Company company=companyRepository.findById(companyId).get();
+        company.setIcon(icon.getBytes());
+        Company savedCompany = companyRepository.save(company);
+        return new ActionDTO(savedCompany.getCompanyId(),true,"Company Details Added Successfully.");
+    }
+
+    public ActionDTO reportEmployee(Integer employeeId, String message){
+        Employee employee=employeeRepository.findById(employeeId).get();
+        employee.setStatus("Reported");
+        employee.setReview(message);
+        employeeRepository.save(employee);
+        return new ActionDTO(employeeId,true,"Employees Reported Successfully !");
+    }
+
+    @Transactional
+    private Company getCompanyById(Integer companyId) {
         return companyRepository.findById(companyId).get();
     }
 
-    private EmployeeDTO parseEmployee(Employee employee)
-    {
-        EmployeeDTO employeeDTO=new EmployeeDTO();
+    private EmployeeDTO parseEmployee(Employee employee) {
+        EmployeeDTO employeeDTO = new EmployeeDTO();
         employeeDTO.setAddress(employee.getAddress());
         employeeDTO.setUsername(employee.getUsername());
         employeeDTO.setEmployeeId(employee.getEmployeeId());
@@ -287,21 +193,21 @@ public class CompanyService {
         employeeDTO.setDocumentType(employee.getDocumentType());
         employeeDTO.setStatus(employee.getStatus());
         employeeDTO.setGender(employee.getGender());
-        return  employeeDTO;
+        return employeeDTO;
     }
+
     private String generateUsername(Employee employee) {
-        String username="";
+        String username = "";
         UUID uuid = UUID.randomUUID();
         String uuidAsString = uuid.toString();
-        username+=employee.getFirstName().substring(0,1);
-        username+=employee.getLastName();
-        username+=uuidAsString.substring(0,3);
+        username += employee.getFirstName().substring(0, 1);
+        username += employee.getLastName();
+        username += uuidAsString.substring(0, 3);
         return username;
     }
 
-    private static char[] generatePassword(Employee employee)
-    {
-        String name=employee.getFirstName();
+    private static char[] generatePassword(Employee employee) {
+        String name = employee.getFirstName();
 
         String capitalCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
@@ -316,45 +222,36 @@ public class CompanyService {
         password[3] = numbers.charAt(random.nextInt(numbers.length()));
         password[4] = specialCharacters.charAt(random.nextInt(specialCharacters.length()));
 
-        for(int i = 5; i< 7 ; i++) {
+        for (int i = 5; i < 7; i++) {
             password[i] = combinedChars.charAt(random.nextInt(combinedChars.length()));
         }
         return password;
 
     }
 
-    private CompanyDTO parseCompany(Company company)
-    {
-        CompanyDTO companyDTO=new CompanyDTO();
-        List<EmployeeDTO> employeeDTOS=new LinkedList<>();
-        EmployeeDTO employeeDTO ;
-        Integer pendingEmployees=0;
-        Integer rejectedEmployees=0;
-        Integer acceptedEmployees=0;
-        Integer totalEmployees=0;
-        for(Employee employee:company.getEmployees())
-        {
-            if(employee.getStatus().equalsIgnoreCase("Pending"))
-            {
-                pendingEmployees+=1;
+    private CompanyDTO parseCompany(Company company) {
+        CompanyDTO companyDTO = new CompanyDTO();
+        List<EmployeeDTO> employeeDTOS = new LinkedList<>();
+        EmployeeDTO employeeDTO;
+        Integer pendingEmployees = 0;
+        Integer rejectedEmployees = 0;
+        Integer acceptedEmployees = 0;
+        Integer totalEmployees = 0;
+        for (Employee employee : company.getEmployees()) {
+            if (employee.getStatus().equalsIgnoreCase("Pending")) {
+                pendingEmployees += 1;
             }
-            if(employee.getStatus().equalsIgnoreCase("Rejected"))
-            {
-                rejectedEmployees+=1;
+            if (employee.getStatus().equalsIgnoreCase("Rejected")) {
+                rejectedEmployees += 1;
             }
-            if(employee.getStatus().equalsIgnoreCase("Accepted"))
-            {
-                acceptedEmployees+=1;
+            if (employee.getStatus().equalsIgnoreCase("Accepted")) {
+                acceptedEmployees += 1;
             }
-            totalEmployees+=1;
-            employeeDTO=parseEmployee(employee);
+            totalEmployees += 1;
+            employeeDTO = parseEmployee(employee);
             employeeDTOS.add(employeeDTO);
 
         }
-        companyDTO.setNumberOfTotalEmployees(totalEmployees);
-        companyDTO.setNumberOfPendingEmployees(pendingEmployees);
-        companyDTO.setNumberOfRejectedEmployees(rejectedEmployees);
-        companyDTO.setNumberOfAcceptedEmployees(acceptedEmployees);
         companyDTO.setEmployees(employeeDTOS);
 
         companyDTO.setCompanyId(company.getCompanyId());
@@ -363,13 +260,13 @@ public class CompanyService {
         companyDTO.setCinNumber(company.getCinNumber());
         companyDTO.setUsername(company.getUsername());
         companyDTO.setAddress(companyDTO.getAddress());
-        return  companyDTO;
+        return companyDTO;
     }
 
 
     public ActionDTO registerEmployees(Integer id, MultipartFile employeesList) throws IOException {
 
-        System.out.println("Chalaaa"+employeesList.getInputStream());
+        System.out.println("Chalaaa" + employeesList.getInputStream());
         String DELIMITER = ",";
         InputStreamReader isr = new InputStreamReader(employeesList.getInputStream(),
                 StandardCharsets.UTF_8);
@@ -379,8 +276,8 @@ public class CompanyService {
         Employee employee;
         br.readLine();
         while ((line = br.readLine()) != null) {
-            employee=new Employee();
-          String[]  columns = line.split(DELIMITER);
+            employee = new Employee();
+            String[] columns = line.split(DELIMITER);
             employee.setFirstName(columns[0]);
             employee.setLastName(columns[1]);
             employee.setEmailID(columns[2]);
@@ -389,7 +286,7 @@ public class CompanyService {
             employee.setStatus("Registered");
             employeeRepository.save(employee);
         }
-        return new ActionDTO(1,true,"Employees Added Successfully !");
+        return new ActionDTO(1, true, "Employees Added Successfully !");
     }
 }
 
