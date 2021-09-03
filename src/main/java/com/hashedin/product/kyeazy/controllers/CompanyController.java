@@ -81,6 +81,13 @@ public class CompanyController {
     public ActionDTO reportEmployee(@PathVariable Integer id, @RequestBody String message) {
         return companyService.reportEmployee(id,message);
     }
+    @PatchMapping(value="/icon/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ActionDTO updateImage(@PathVariable Integer id, @RequestParam("icon") MultipartFile icon) throws IOException
+    {
+        return  companyService.updateCompanyImage(id,icon);
+    }
+
+
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleException(DataAlreadyExistsException exc) {
         ExceptionResponse error = new ExceptionResponse();

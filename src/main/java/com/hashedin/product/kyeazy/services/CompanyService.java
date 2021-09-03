@@ -228,38 +228,23 @@ public class CompanyService {
         return password;
 
     }
-
     private CompanyDTO parseCompany(Company company) {
         CompanyDTO companyDTO = new CompanyDTO();
         List<EmployeeDTO> employeeDTOS = new LinkedList<>();
         EmployeeDTO employeeDTO;
-        Integer pendingEmployees = 0;
-        Integer rejectedEmployees = 0;
-        Integer acceptedEmployees = 0;
-        Integer totalEmployees = 0;
         for (Employee employee : company.getEmployees()) {
-            if (employee.getStatus().equalsIgnoreCase("Pending")) {
-                pendingEmployees += 1;
-            }
-            if (employee.getStatus().equalsIgnoreCase("Rejected")) {
-                rejectedEmployees += 1;
-            }
-            if (employee.getStatus().equalsIgnoreCase("Accepted")) {
-                acceptedEmployees += 1;
-            }
-            totalEmployees += 1;
             employeeDTO = parseEmployee(employee);
             employeeDTOS.add(employeeDTO);
-
         }
         companyDTO.setEmployees(employeeDTOS);
-
         companyDTO.setCompanyId(company.getCompanyId());
         companyDTO.setCompanyDescription(company.getCompanyDescription());
         companyDTO.setName(company.getName());
         companyDTO.setCinNumber(company.getCinNumber());
         companyDTO.setUsername(company.getUsername());
         companyDTO.setAddress(companyDTO.getAddress());
+        companyDTO.setIcon(company.getIcon());
+        companyDTO.setEmailId(company.getEmailId());
         return companyDTO;
     }
 

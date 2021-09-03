@@ -215,6 +215,7 @@ public class AdminService {
         companyDTO.setUsername(company.getUsername());
         companyDTO.setAddress(companyDTO.getAddress());
         companyDTO.setIcon(company.getIcon());
+        companyDTO.setEmailId(company.getEmailId());
         return companyDTO;
     }
 

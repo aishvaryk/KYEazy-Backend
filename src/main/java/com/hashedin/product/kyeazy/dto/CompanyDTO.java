@@ -17,9 +17,10 @@ public class CompanyDTO {
     private  String username;
     private  String name;
     private  String companyDescription;
-    private  String  CinNumber;
+    private  String  cinNumber;
     private  String address;
     private  byte[] icon;
+    private String emailId;
     private List<EmployeeDTO> employees;
 
 
