@@ -30,7 +30,7 @@ public class EmployeeController {
         return  employeeService.updateEmployeeImage(id,profilePicture);
     }
 
-    @PatchMapping(value="/update-video/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    @                                                                                                                                           PatchMapping(value="/update-video/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
     public ActionDTO updateVideo(@PathVariable Integer id, @RequestParam("employeeVideo") MultipartFile employeeVideo) throws IOException
     {
         return  employeeService.updateEmployeeVideo(id,employeeVideo);

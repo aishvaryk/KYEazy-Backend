@@ -248,17 +248,17 @@ public class CompanyService {
                 acceptedEmployees += 1;
             }
             totalEmployees += 1;
-            companyDTO.setNumberOfTotalEmployees(totalEmployees);
-            companyDTO.setNumberOfPendingEmployees(pendingEmployees);
-            companyDTO.setNumberOfRejectedEmployees(rejectedEmployees);
-            companyDTO.setNumberOfAcceptedEmployees(acceptedEmployees);
-            companyDTO.setEmployees(employeeDTOS);
             employeeDTO = parseEmployee(employee);
 
             employeeDTOS.add(employeeDTO);
 
         }
+        companyDTO.setNumberOfTotalEmployees(totalEmployees);
+        companyDTO.setNumberOfPendingEmployees(pendingEmployees);
+        companyDTO.setNumberOfRejectedEmployees(rejectedEmployees);
+        companyDTO.setNumberOfAcceptedEmployees(acceptedEmployees);
         companyDTO.setEmployees(employeeDTOS);
+
 
         companyDTO.setCompanyId(company.getCompanyId());
         companyDTO.setCompanyDescription(company.getCompanyDescription());
