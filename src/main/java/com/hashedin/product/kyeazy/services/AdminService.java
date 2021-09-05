@@ -88,6 +88,9 @@ public class AdminService {
         Employee employee = getEmployeeById(id);
         employee.setStatus(status);
         employee.setDateTimeOfVerification(new Date());
+        Company company =companyRepository.findById(employee.getCompanyId()).get();
+        company.setCoins(company.getCoins()-company.getPlan());
+        companyRepository.save(company);
         Employee savedEmployee = employeeRepository.save(employee);
         return parseEmployee(savedEmployee);
     }
@@ -203,10 +206,37 @@ public class AdminService {
         CompanyDTO companyDTO = new CompanyDTO();
         List<EmployeeDTO> employeeDTOS = new LinkedList<>();
         EmployeeDTO employeeDTO;
+        Integer pendingEmployees = 0;
+        Integer rejectedEmployees = 0;
+        Integer acceptedEmployees = 0;
+        Integer totalEmployees = 0;
+        Integer registeredEmployees = 0;
+
         for (Employee employee : company.getEmployees()) {
+            if (employee.getStatus().equalsIgnoreCase("Pending")) {
+                pendingEmployees += 1;
+            }
+            if (employee.getStatus().equalsIgnoreCase("Rejected")) {
+                rejectedEmployees += 1;
+            }
+            if (employee.getStatus().equalsIgnoreCase("Accepted")) {
+                acceptedEmployees += 1;
+            }
+            if (employee.getStatus().equalsIgnoreCase("Registered")) {
+                registeredEmployees += 1;
+            }
+
+            totalEmployees += 1;
+
             employeeDTO = parseEmployee(employee);
             employeeDTOS.add(employeeDTO);
         }
+        companyDTO.setNumberOfTotalEmployees(totalEmployees);
+        companyDTO.setNumberOfPendingEmployees(pendingEmployees);
+        companyDTO.setNumberOfRejectedEmployees(rejectedEmployees);
+        companyDTO.setNumberOfAcceptedEmployees(acceptedEmployees);
+        companyDTO.setNumberOfRegisteredEmployees(registeredEmployees);
+
         companyDTO.setEmployees(employeeDTOS);
         companyDTO.setCompanyId(company.getCompanyId());
         companyDTO.setCompanyDescription(company.getCompanyDescription());

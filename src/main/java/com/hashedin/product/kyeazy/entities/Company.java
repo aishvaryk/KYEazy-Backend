@@ -41,7 +41,7 @@ public class Company {
     private  Address address;
 
     @Column(name="plan")
-    private Integer plan;
+    private Integer plan=10;
 
     @OneToMany(cascade=CascadeType.ALL)
     @JoinColumn(name="company_order_id",referencedColumnName ="company_id" )

@@ -25,6 +25,7 @@ public class CompanyDTO {
     private Integer numberOfPendingEmployees;
     private Integer numberOfAcceptedEmployees;
     private Integer numberOfRejectedEmployees;
+    private Integer numberOfRegisteredEmployees;
     private Integer numberOfTotalEmployees;
     private Integer coins;
     private Integer planCoins;
