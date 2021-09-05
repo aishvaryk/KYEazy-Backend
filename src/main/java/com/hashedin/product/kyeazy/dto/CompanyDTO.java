@@ -23,6 +23,8 @@ public class CompanyDTO {
     private  byte[] icon;
     private List<EmployeeDTO> employees;
     private Integer numberOfPendingEmployees;
+    private Integer numberOfRegisteredEmployees;
+    private Integer numberOfReportedEmployees;
     private Integer numberOfAcceptedEmployees;
     private Integer numberOfRejectedEmployees;
     private Integer numberOfRegisteredEmployees;
