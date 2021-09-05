@@ -203,10 +203,41 @@ public class AdminService {
         CompanyDTO companyDTO = new CompanyDTO();
         List<EmployeeDTO> employeeDTOS = new LinkedList<>();
         EmployeeDTO employeeDTO;
+
+        int pendingEmployees = 0;
+        int rejectedEmployees = 0;
+        int acceptedEmployees = 0;
+        int registeredEmployee = 0;
+        int reportedEmployee = 0;
+        int totalEmployees = 0;
+
         for (Employee employee : company.getEmployees()) {
             employeeDTO = parseEmployee(employee);
+            if (employee.getStatus().equalsIgnoreCase("Pending")) {
+                pendingEmployees += 1;
+            }
+            if (employee.getStatus().equalsIgnoreCase("Rejected")) {
+                rejectedEmployees += 1;
+            }
+            if (employee.getStatus().equalsIgnoreCase("Accepted")) {
+                acceptedEmployees += 1;
+            }
+            if (employee.getStatus().equalsIgnoreCase("Reported")) {
+                reportedEmployee += 1;
+            }
+            if (employee.getStatus().equalsIgnoreCase("Registered")) {
+                registeredEmployee += 1;
+            }
+
+            totalEmployees += 1;
             employeeDTOS.add(employeeDTO);
         }
+        companyDTO.setNumberOfRegisteredEmployees(registeredEmployee);
+        companyDTO.setNumberOfReportedEmployees(reportedEmployee)           ;
+        companyDTO.setNumberOfTotalEmployees(totalEmployees);
+        companyDTO.setNumberOfPendingEmployees(pendingEmployees);
+        companyDTO.setNumberOfRejectedEmployees(rejectedEmployees);
+        companyDTO.setNumberOfAcceptedEmployees(acceptedEmployees);
         companyDTO.setEmployees(employeeDTOS);
         companyDTO.setCompanyId(company.getCompanyId());
         companyDTO.setCompanyDescription(company.getCompanyDescription());

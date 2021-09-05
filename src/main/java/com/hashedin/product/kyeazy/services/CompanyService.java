@@ -48,7 +48,6 @@ public class CompanyService {
     }
 
     public CompanyDTO register(Company company) {
-
         List<Company> companies = companyRepository.findAll();
         for (Company companyToCheck : companies) {
             if (companyToCheck.getUsername().equals(company.getUsername()))
@@ -57,12 +56,10 @@ public class CompanyService {
                 throw new DataAlreadyExistsException("The Company is already registered !!!!!");
         }
         Company addedCompany = companyRepository.save(company);
-
         return parseCompany(addedCompany);
     }
 
     public ActionDTO registerEmployee(Employee employee, int companyId) throws DataAlreadyExistsException {
-
         List<Employee> employees = employeeRepository.findAll();
         for (Employee employeeToCheck : employees) {
             if (employeeToCheck.getEmailID().equals(employee.getEmailID()) && employeeToCheck.getCompanyId() == companyId)
@@ -72,7 +69,6 @@ public class CompanyService {
                 employeeToCheck.setCompanyId(companyId);
                 return null ;
             }
-
         }
         String username = this.generateUsername(employee);
         String passkey = String.valueOf(this.generatePassword(employee));
@@ -125,8 +121,6 @@ public class CompanyService {
             employeeDTOS.add(parseEmployee(employee));
         }
         return employeeDTOS;
-
-
     }
 
     @Transactional
@@ -139,7 +133,6 @@ public class CompanyService {
             allEmployeeDTOS.add(parseEmployee(e));
         }
         return allEmployeeDTOS;
-
     }
 
     @Transactional
@@ -152,8 +145,8 @@ public class CompanyService {
             allEmployeeDTOS.add(parseEmployee(e));
         }
         return allEmployeeDTOS;
-
     }
+
     public ActionDTO updateCompanyImage(Integer companyId, MultipartFile icon) throws IOException
     {
         Company company=companyRepository.findById(companyId).get();
@@ -208,7 +201,6 @@ public class CompanyService {
 
     private static char[] generatePassword(Employee employee) {
         String name = employee.getFirstName();
-
         String capitalCaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         String lowerCaseLetters = "abcdefghijklmnopqrstuvwxyz";
         String specialCharacters = "!@#$_";
@@ -221,12 +213,10 @@ public class CompanyService {
         password[2] = name.toLowerCase().charAt(2);
         password[3] = numbers.charAt(random.nextInt(numbers.length()));
         password[4] = specialCharacters.charAt(random.nextInt(specialCharacters.length()));
-
         for (int i = 5; i < 7; i++) {
             password[i] = combinedChars.charAt(random.nextInt(combinedChars.length()));
         }
         return password;
-
     }
 
     private CompanyDTO parseCompany(Company company) {
@@ -249,9 +239,7 @@ public class CompanyService {
             }
             totalEmployees += 1;
             employeeDTO = parseEmployee(employee);
-
             employeeDTOS.add(employeeDTO);
-
         }
         companyDTO.setNumberOfTotalEmployees(totalEmployees);
         companyDTO.setNumberOfPendingEmployees(pendingEmployees);
@@ -271,7 +259,6 @@ public class CompanyService {
 
 
     public ActionDTO registerEmployees(Integer id, MultipartFile employeesList) throws IOException {
-
         String DELIMITER = ",";
         InputStreamReader isr = new InputStreamReader(employeesList.getInputStream(),
                 StandardCharsets.UTF_8);

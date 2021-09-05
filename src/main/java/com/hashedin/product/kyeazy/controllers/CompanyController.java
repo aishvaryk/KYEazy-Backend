@@ -73,20 +73,20 @@ public class CompanyController {
         return companyService.getEmployeesSortedByDate(id, pageNumber, pageSize);
     }
 
-
-
     @GetMapping("/get-employees-by-name/{id}/{name}")
     public List<EmployeeDTO> getEmployeeByName(@PathVariable Integer id, @PathVariable String name, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
         return companyService.getEmployeeByName(id, name, pageNumber, pageSize);
     }
+
     @PostMapping("/report-employee/{id}")
     public List<EmployeeDTO> reportEmployee(@PathVariable Integer id, @RequestBody String message) {
         return companyService.reportEmployee(id,message);
     }
+
     @PatchMapping(value="/add-icon/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ActionDTO updateCapturedImage(@PathVariable Integer id, @RequestParam("profilePicture") MultipartFile profilePicture) throws IOException
+    public ActionDTO updateCapturedImage(@PathVariable Integer id, @RequestParam("companyIcon") MultipartFile companyIcon) throws IOException
     {
-        return  companyService.updateCompanyImage(id,profilePicture);
+        return  companyService.updateCompanyImage(id,companyIcon);
     }
 
     @ExceptionHandler
@@ -106,6 +106,5 @@ public class CompanyController {
         error.setMessage(exc.getMessage());
         error.setTimeStamp(System.currentTimeMillis());
         return new ResponseEntity<>(error, HttpStatus.LENGTH_REQUIRED);
-
     }
 }
