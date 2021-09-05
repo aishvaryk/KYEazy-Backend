@@ -80,7 +80,7 @@ public class CompanyController {
         return companyService.getEmployeeByName(id, name, pageNumber, pageSize);
     }
     @PostMapping("/report-employee/{id}")
-    public ActionDTO reportEmployee(@PathVariable Integer id, @RequestBody String message) {
+    public List<EmployeeDTO> reportEmployee(@PathVariable Integer id, @RequestBody String message) {
         return companyService.reportEmployee(id,message);
     }
     @PatchMapping(value="/add-icon/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)

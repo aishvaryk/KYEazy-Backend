@@ -162,12 +162,12 @@ public class CompanyService {
         return new ActionDTO(savedCompany.getCompanyId(),true,"Company Details Added Successfully.");
     }
 
-    public ActionDTO reportEmployee(Integer employeeId, String message){
+    public List<EmployeeDTO> reportEmployee(Integer employeeId, String message){
         Employee employee=employeeRepository.findById(employeeId).get();
         employee.setStatus("Reported");
         employee.setReview(message);
         employeeRepository.save(employee);
-        return new ActionDTO(employeeId,true,"Employees Reported Successfully !");
+        return getEmployees(employee.getCompanyId(), 1, 5);
     }
 
     @Transactional
