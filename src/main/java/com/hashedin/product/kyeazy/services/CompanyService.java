@@ -78,6 +78,7 @@ public class CompanyService {
         employee.setStatus("Registered");
         employee.setDateTimeOfApplication(new Date());
         employee.setCompanyId(companyId);
+
         Employee addedEmployee = employeeRepository.save(employee);
         return new ActionDTO(addedEmployee.getEmployeeId(), true, "Employee KYC Under Progress Wait for 2-3 days");
     }
@@ -270,10 +271,10 @@ public class CompanyService {
         companyDTO.setAddress(companyDTO.getAddress());
         companyDTO.setIcon(company.getIcon());
         companyDTO.setCoins(company.getCoins());
-        companyDTO.setPlanCoins(company.getPlan());
+        companyDTO.setPlan(company.getPlan());
+
         return companyDTO;
     }
-
 
     public ActionDTO registerEmployees(Integer id, MultipartFile employeesList) throws IOException {
         String DELIMITER = ",";
@@ -292,7 +293,14 @@ public class CompanyService {
             employee.setEmailID(columns[2]);
             employee.setContactNumber(columns[3]);
             employee.setCompanyId(id);
+            String username = this.generateUsername(employee);
+            String passkey = String.valueOf(this.generatePassword(employee));
+            employee.setDisplayName(employee.getFirstName()+" "+employee.getLastName());
             employee.setStatus("Registered");
+            String link = "https://kycfront-amxbp6pvia-as.a.run.app/";
+            String mailBody = "Hey " + employee.getFirstName() + "," + "Your Id password for doing kyc is  Username: " + username + " Password:" + passkey + " Link:" + link;
+            this.emailSender.sendMail(employee.getEmailID(), "Regarding KYC", mailBody);
+
             employeeRepository.save(employee);
         }
         return new ActionDTO(1, true, "Employees Added Successfully !");

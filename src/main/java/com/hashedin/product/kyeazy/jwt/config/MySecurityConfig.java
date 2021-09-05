@@ -37,6 +37,10 @@ public class MySecurityConfig extends WebSecurityConfigurerAdapter {
                         "/token",
                         "/company/register",
                         "/payment/create-order/*",
+                        "/payment/generate-order/*",
+                        "/payment/payment-history/*",
+
+
                         "/swagger-ui.html",
                         "/webjars/**",
                         "/swagger-resources/**",
