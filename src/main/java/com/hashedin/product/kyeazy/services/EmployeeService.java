@@ -35,6 +35,7 @@ public class EmployeeService {
         employee.setAddress(employeeDetails.getAddress());
         employee.setGender(employeeDetails.getGender());
         employee.setDisplayName(employeeDetails.getFirstName()+" "+employee.getLastName());
+        employee.setQuestion(employeeDetails.getQuestion());
         Employee savedEmployee = employeeRepository.save(employee);
         return new ActionDTO(savedEmployee.getEmployeeId(),true,"Employee Details Added Successfully.");
     }

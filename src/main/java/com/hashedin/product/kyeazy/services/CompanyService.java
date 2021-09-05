@@ -258,21 +258,20 @@ public class CompanyService {
         companyDTO.setNumberOfRejectedEmployees(rejectedEmployees);
         companyDTO.setNumberOfAcceptedEmployees(acceptedEmployees);
         companyDTO.setEmployees(employeeDTOS);
-
-
         companyDTO.setCompanyId(company.getCompanyId());
         companyDTO.setCompanyDescription(company.getCompanyDescription());
         companyDTO.setName(company.getName());
         companyDTO.setCinNumber(company.getCinNumber());
         companyDTO.setUsername(company.getUsername());
-        companyDTO.setAddress(companyDTO.getAddress());
+        companyDTO.setAddress(company.getAddress());
+        companyDTO.setCoins(company.getCoins());
+        companyDTO.setPlanCoins(company.getPlan());
         return companyDTO;
     }
 
 
     public ActionDTO registerEmployees(Integer id, MultipartFile employeesList) throws IOException {
 
-        System.out.println("Chalaaa" + employeesList.getInputStream());
         String DELIMITER = ",";
         InputStreamReader isr = new InputStreamReader(employeesList.getInputStream(),
                 StandardCharsets.UTF_8);
@@ -294,6 +293,8 @@ public class CompanyService {
         }
         return new ActionDTO(1, true, "Employees Added Successfully !");
     }
+
+
 }
 
 

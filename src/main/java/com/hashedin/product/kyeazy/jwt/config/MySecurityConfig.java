@@ -36,6 +36,7 @@ public class MySecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(
                         "/token",
                         "/company/register",
+                        "/payment/create-order/*",
                         "/swagger-ui.html",
                         "/webjars/**",
                         "/swagger-resources/**",

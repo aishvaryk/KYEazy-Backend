@@ -215,6 +215,8 @@ public class AdminService {
         companyDTO.setUsername(company.getUsername());
         companyDTO.setAddress(companyDTO.getAddress());
         companyDTO.setIcon(company.getIcon());
+        companyDTO.setCoins(company.getCoins());
+        companyDTO.setPlanCoins(company.getPlan());
         return companyDTO;
     }
 
@@ -235,7 +237,7 @@ public class AdminService {
         employeeDTO.setStatus(employee.getStatus());
         employeeDTO.setGender(employee.getGender());
         employeeDTO.setCapturedImage(employee.getCapturedImage());
-        employeeDTO.setGender(employee.getGender());
+        employeeDTO.setQuestion(employee.getQuestion());
         return employeeDTO;
     }
 

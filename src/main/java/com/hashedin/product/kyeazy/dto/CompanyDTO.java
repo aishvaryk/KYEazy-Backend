@@ -1,5 +1,6 @@
 package com.hashedin.product.kyeazy.dto;
 
+import com.hashedin.product.kyeazy.entities.Address;
 import com.hashedin.product.kyeazy.entities.Employee;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -18,13 +19,15 @@ public class CompanyDTO {
     private  String name;
     private  String companyDescription;
     private  String  CinNumber;
-    private  String address;
+    private Address address;
     private  byte[] icon;
     private List<EmployeeDTO> employees;
     private Integer numberOfPendingEmployees;
     private Integer numberOfAcceptedEmployees;
     private Integer numberOfRejectedEmployees;
     private Integer numberOfTotalEmployees;
+    private Integer coins;
+    private Integer planCoins;
 
 
 }

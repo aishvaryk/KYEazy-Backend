@@ -37,6 +37,8 @@ public class Employee {
     @Column(name="review")
     private String review;
 
+    @Column(name="question")
+    private String question;
 
     @Column(name="contact_number")
     private String contactNumber;
@@ -78,11 +80,5 @@ public class Employee {
     @Column(name="company_id")
     private  Integer companyId;
 
-    /*
-    @ManyToOne
-    @MapsId("companyId")
-    @JoinColumn(name="company_id")
-    private Company company;
-    */
 
 }

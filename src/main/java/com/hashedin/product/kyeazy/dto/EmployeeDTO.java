@@ -28,6 +28,7 @@ public class EmployeeDTO {
     private  Integer companyId;
     private byte[] capturedImage;
     private String gender;
+    private String question;
 
 
 }

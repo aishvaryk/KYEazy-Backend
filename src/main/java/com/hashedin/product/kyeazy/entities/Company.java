@@ -3,6 +3,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -32,9 +33,19 @@ public class Company {
     @Column(name="cin_number")
     private String cinNumber;
 
+    @Column(name="coins")
+    private Integer coins=200;
+
     @OneToOne(cascade=CascadeType.ALL)
     @JoinColumn(name="addressId")
     private  Address address;
+
+    @Column(name="plan")
+    private Integer plan;
+
+    @OneToMany(cascade=CascadeType.ALL)
+    @JoinColumn(name="company_order_id",referencedColumnName ="company_id" )
+    private Set<CompanyOrder> orders = new HashSet<>();
 
     @Lob
     @Column(name="icon")
