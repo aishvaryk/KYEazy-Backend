@@ -1,0 +1,19 @@
+stages:
+  - deploy
+
+deploy:
+  stage: deploy
+  tags:
+  - shellgcp-hu20
+  only:
+  - master
+  script:
+  - echo $CI_PROJECT_DIR
+  - cd
+  - cd /home/gitlab-runner
+  - gcloud auth activate-service-account --key-file shell.json
+  - gcloud config set project hu18-groupb-java
+  - cd
+  - cd $CI_PROJECT_DIR
+  - gcloud builds submit . --config=cloudbuild.yaml --substitutions=TAG_NAME=${CI_COMMIT_BRANCH}
+  #- gcloud logging read "resource.type=cloud_run_revision AND resource.labels.service_name=${GITLAB_USER_

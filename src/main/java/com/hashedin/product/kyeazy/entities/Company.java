@@ -30,6 +30,9 @@ public class Company {
     @Column(name="company_description")
     private String companyDescription;
 
+    @Column(name="emailId")
+    private String emailId;
+
     @Column(name="cin_number")
     private String cinNumber;
 

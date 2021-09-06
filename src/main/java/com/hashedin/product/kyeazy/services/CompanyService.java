@@ -270,5 +270,4 @@ public class CompanyService {
         }
         return password;
     }
-
 }

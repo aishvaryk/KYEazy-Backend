@@ -21,6 +21,7 @@ public class CompanyDTO {
     private  String  CinNumber;
     private Address address;
     private  byte[] icon;
+    private String emailId;
     private List<EmployeeDTO> employees;
     private Integer numberOfPendingEmployees;
     private Integer numberOfRegisteredEmployees;
