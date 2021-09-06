@@ -1,4 +1,4 @@
-package com.hashedin.product.kyeazy.jwt.config.util;
+package com.hashedin.product.kyeazy.utils;
 
 import io.jsonwebtoken.Claims;
         import io.jsonwebtoken.Jwts;

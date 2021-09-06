@@ -54,12 +54,13 @@ public class PaymentController {
     public ActionDTO paymentSuccess(@PathVariable Integer companyId,@PathVariable Integer coins,@PathVariable String orderId,@PathVariable String paymentId) throws Exception {
         Company company=companyRepository.findById(companyId).get();
         company.setCoins(company.getCoins()+coins);
+        Company savedCompany = companyRepository.save(company);
         CompanyOrder companyOrder=new CompanyOrder();
         companyOrder.setCompanyOrderId(companyId);
         companyOrder.setOrderId(orderId);
         companyOrder.setAmount(company.getCoins()+coins*company.getPlan());
         companyOrder.setPaymentId(paymentId);
         CompanyOrder savedOrder=orderRepository.save(companyOrder);
-        return new ActionDTO(1,true,"Order Added Successfully");
+        return new ActionDTO(savedCompany.getCoins(),true,"Order Added Successfully");
     }
 }
