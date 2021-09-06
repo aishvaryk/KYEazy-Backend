@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface CompanyRepository extends JpaRepository<Company, Integer> {
     List<Company> findAllCompaniesByNameStartingWith(String name, Pageable pageable);
+    List<Company> findAllCompaniesByNameStartingWith(String name);
 }

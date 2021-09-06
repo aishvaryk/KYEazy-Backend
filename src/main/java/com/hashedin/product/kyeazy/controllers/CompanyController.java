@@ -1,12 +1,10 @@
 package com.hashedin.product.kyeazy.controllers;
-
 import com.hashedin.product.kyeazy.dto.ActionDTO;
 import com.hashedin.product.kyeazy.dto.CompanyDTO;
 import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.exceptions.DataAlreadyExistsException;
-import com.hashedin.product.kyeazy.exceptions.RequiredFieldException;
 import com.hashedin.product.kyeazy.exceptions.response.ExceptionResponse;
 import com.hashedin.product.kyeazy.services.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 @CrossOrigin
 @RestController
@@ -32,14 +29,11 @@ public class CompanyController {
         this.companyService = companyService;
     }
 
+    // company
+
     @PostMapping(value = "/register")
     public CompanyDTO register(@RequestBody Company company) {
         return companyService.register(company);
-    }
-
-    @PostMapping(value = "/register-employees/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ActionDTO registerEmployees(@PathVariable Integer id, @RequestParam("employeeCSV") MultipartFile employeeVideo) throws IOException {
-        return companyService.registerEmployees(id, employeeVideo);
     }
 
     @PostMapping(value = "/register-employee/{companyId}")
@@ -47,35 +41,9 @@ public class CompanyController {
         return this.companyService.registerEmployee(employee, companyId);
     }
 
-    @GetMapping("/employees/{companyId}")
-    public List<EmployeeDTO> getEmployees(@PathVariable Integer companyId, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
-        return companyService.getEmployees(companyId, pageNumber, pageSize);
-    }
-
-    //error
-    @GetMapping("/employees-by-status/{companyId}/{status}")
-    public List<EmployeeDTO> getEmployeesByStatus(@PathVariable Integer companyId, @PathVariable String status, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
-        return companyService.getEmployeesByStatus(companyId, status, pageNumber, pageSize);
-    }
-
-    @GetMapping("/get-company-details/{id}")
-    public CompanyDTO getCompanyDetails(@PathVariable Integer id) {
-        return companyService.getCompanyDetails(id);
-    }
-
-    @GetMapping("/get-employees-sorted-by-name/{id}")
-    public List<EmployeeDTO> getEmployeesSortedByName(@PathVariable Integer id, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
-        return companyService.getEmployeesSortedByName(id, pageNumber, pageSize);
-    }
-
-    @GetMapping("/get-employees-sorted-by-date/{id}")
-    public List<EmployeeDTO> getEmployeesSortedByDate(@PathVariable Integer id, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
-        return companyService.getEmployeesSortedByDate(id, pageNumber, pageSize);
-    }
-
-    @GetMapping("/get-employees-by-name/{id}/{name}")
-    public List<EmployeeDTO> getEmployeeByName(@PathVariable Integer id, @PathVariable String name, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
-        return companyService.getEmployeeByName(id, name, pageNumber, pageSize);
+    @PostMapping(value = "/register-employees/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ActionDTO registerEmployees(@PathVariable Integer id, @RequestParam("employeeCSV") MultipartFile employeeVideo) throws IOException {
+        return companyService.registerEmployees(id, employeeVideo);
     }
 
     @PostMapping("/report-employee/{id}")
@@ -84,10 +52,42 @@ public class CompanyController {
     }
 
     @PatchMapping(value="/add-icon/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ActionDTO updateCapturedImage(@PathVariable Integer id, @RequestParam("companyIcon") MultipartFile companyIcon) throws IOException
+    public ActionDTO updateCompanyIcon(@PathVariable Integer id, @RequestParam("companyIcon") MultipartFile companyIcon) throws IOException
     {
-        return  companyService.updateCompanyImage(id,companyIcon);
+        return  companyService.updateCompanyIcon(id,companyIcon);
     }
+
+    @GetMapping("/get-company-details/{id}")
+    public CompanyDTO getCompanyDetails(@PathVariable Integer id) {
+        return companyService.getCompanyDetails(id);
+    }
+
+    // employees
+
+    @GetMapping("/employees/{companyId}")
+    public List<EmployeeDTO> getEmployees(@PathVariable Integer companyId, @RequestParam Integer pageNumber, @RequestParam Integer pageSize, @RequestParam String sort, @RequestParam String filter) {
+        return companyService.getEmployees(companyId, pageNumber, pageSize,sort,filter);
+    }
+
+    @GetMapping("/get-employees-by-name/{id}/{name}")
+    public List<EmployeeDTO> getEmployeesByName(@PathVariable Integer id, @PathVariable String name, @RequestParam Integer pageNumber, @RequestParam Integer pageSize, @RequestParam String sort, @RequestParam String filter) {
+        return companyService.getEmployeesByName(id, name, pageNumber, pageSize, sort, filter);
+    }
+
+    // count
+
+    @GetMapping("/get-searched-employees-size/{companyId}/{name}/{status}")
+    public long getSearchedEmployeesSize(@PathVariable String name, @PathVariable int companyId, @PathVariable String status ) {
+        return companyService.getSearchedEmployeesSize(companyId, name, status);
+    }
+
+    @GetMapping("/get-employees-size/{companyId}/{filter}")
+    public long getEmployeesSize(@PathVariable int companyId,@PathVariable String filter ) {
+        return companyService.getEmployeesSize(companyId, filter);
+    }
+
+
+    // exceptions
 
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleException(DataAlreadyExistsException exc) {
@@ -96,7 +96,6 @@ public class CompanyController {
         error.setMessage(exc.getMessage());
         error.setTimeStamp(System.currentTimeMillis());
         return new ResponseEntity<>(error, HttpStatus.LENGTH_REQUIRED);
-
     }
 
     @ExceptionHandler
