@@ -46,7 +46,7 @@ public class PaymentController {
     @GetMapping("/payment-history/{companyId}")
     public List<CompanyOrder> getPaymentHistory(@PathVariable Integer companyId)
     {
-        Pageable pageable=PageRequest.of(0, 5, Sort.by("companyOrderId").descending());
+        Pageable pageable=PageRequest.of(0, 5, Sort.by("orderUniqueId").descending());
         return orderRepository.findByCompanyOrderId(companyId,pageable);
     }
 
