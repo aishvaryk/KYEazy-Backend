@@ -29,7 +29,7 @@ public class CompanyDTO {
     private Integer numberOfRejectedEmployees;
     private Integer numberOfTotalEmployees;
     private Integer coins;
-    private Integer planCoins;
+    private Integer plan;
 
 
 }

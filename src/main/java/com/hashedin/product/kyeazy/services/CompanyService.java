@@ -93,6 +93,7 @@ public class CompanyService {
         employee.setStatus("Registered");
         employee.setDateTimeOfApplication(new Date());
         employee.setCompanyId(companyId);
+
         Employee addedEmployee = employeeRepository.save(employee);
         return new ActionDTO(addedEmployee.getEmployeeId(), true, "Employee KYC Under Progress Wait for 2-3 days");
     }
