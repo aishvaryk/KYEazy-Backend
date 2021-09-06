@@ -34,6 +34,7 @@ public class MySecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors().and()
                 .authorizeRequests()
                 .antMatchers(
+                        "/company/add-icon/*",
                         "/token",
                         "/company/register",
                         "/payment/create-order/*",
