@@ -55,7 +55,7 @@ public class Parser {
         companyDTO.setAddress(companyDTO.getAddress());
         companyDTO.setIcon(company.getIcon());
         companyDTO.setCoins(company.getCoins());
-        companyDTO.setPlanCoins(company.getPlan());
+        companyDTO.setPlan(company.getPlan());
         return companyDTO;
     }
 
