@@ -32,7 +32,3 @@ build/
 
 ### VS Code ###
 .vscode/
-
-.gitignore
-/src/main/resources/employee_videos/
-/src/main/resources/employee_documents/
