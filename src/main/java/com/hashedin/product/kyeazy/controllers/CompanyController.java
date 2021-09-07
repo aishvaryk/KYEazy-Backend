@@ -37,18 +37,23 @@ public class CompanyController {
     }
 
     @PostMapping(value = "/register-employee/{companyId}")
-    public ActionDTO registerEmployee(@RequestBody Employee employee, @PathVariable Integer companyId) {
+    public ActionDTO registerEmployee(@RequestBody Employee employee, @PathVariable Integer companyId) throws Exception {
         return this.companyService.registerEmployee(employee, companyId);
     }
 
     @PostMapping(value = "/register-employees/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ActionDTO registerEmployees(@PathVariable Integer id, @RequestParam("employeeCSV") MultipartFile employeeVideo) throws IOException {
+    public ActionDTO registerEmployees(@PathVariable Integer id, @RequestParam("employeeCSV") MultipartFile employeeVideo) throws Exception {
         return companyService.registerEmployees(id, employeeVideo);
     }
 
     @PostMapping("/report-employee/{id}")
-    public List<EmployeeDTO> reportEmployee(@PathVariable Integer id, @RequestBody String message) {
+    public ActionDTO reportEmployee(@PathVariable Integer id, @RequestBody String message) {
         return companyService.reportEmployee(id,message);
+    }
+
+    @GetMapping("/re-kyc/{id}")
+    public ActionDTO reKycEmployee(@PathVariable Integer id) {
+        return companyService.reKycEmployee(id);
     }
 
     @PatchMapping(value="/add-icon/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)

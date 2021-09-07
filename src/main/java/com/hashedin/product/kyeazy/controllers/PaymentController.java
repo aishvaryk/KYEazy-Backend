@@ -50,15 +50,15 @@ public class PaymentController {
         return orderRepository.findByCompanyOrderId(companyId,pageable);
     }
 
-    @GetMapping("/payment-success/{companyId}/{coins}/{orderId}/{paymentId}")
-    public ActionDTO paymentSuccess(@PathVariable Integer companyId,@PathVariable Integer coins,@PathVariable String orderId,@PathVariable String paymentId) throws Exception {
+    @GetMapping("/payment-success/{companyId}/{coins}/{orderId}/{paymentId}/{amount}")
+    public ActionDTO paymentSuccess(@PathVariable Integer companyId,@PathVariable Integer coins,@PathVariable String orderId,@PathVariable String paymentId,@PathVariable Integer amount) throws Exception {
         Company company=companyRepository.findById(companyId).get();
         company.setCoins(company.getCoins()+coins);
         Company savedCompany = companyRepository.save(company);
         CompanyOrder companyOrder=new CompanyOrder();
         companyOrder.setCompanyOrderId(companyId);
         companyOrder.setOrderId(orderId);
-        companyOrder.setAmount(company.getCoins()+coins*company.getPlan());
+        companyOrder.setAmount(amount);
         companyOrder.setPaymentId(paymentId);
         CompanyOrder savedOrder=orderRepository.save(companyOrder);
         return new ActionDTO(savedCompany.getCoins(),true,"Order Added Successfully");

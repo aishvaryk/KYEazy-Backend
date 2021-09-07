@@ -61,9 +61,14 @@ public class AdminController {
 
     // employee
 
-    @RequestMapping("/verify/{id}/{status}")
-    public EmployeeDTO verify(@PathVariable Integer id, @PathVariable String status) {
-        return adminService.verify(status, id);
+    @RequestMapping("/accept/{id}")
+    public EmployeeDTO accept(@PathVariable Integer id) {
+        return adminService.accept(id);
+    }
+    @PatchMapping("/reject/{id}")
+    public EmployeeDTO reject(@PathVariable Integer id,@RequestBody String message) {
+        System.out.println("reject"+id);
+        return adminService.reject(id,message);
     }
 
     @RequestMapping("/view-employee-details/{employeeId}")

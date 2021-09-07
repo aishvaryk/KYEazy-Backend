@@ -1,6 +1,7 @@
 package com.hashedin.product.kyeazy.controllers;
 
 import com.hashedin.product.kyeazy.dto.ActionDTO;
+import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.services.EmployeeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class EmployeeController {
         return  employeeService.updateEmployeeImage(id,profilePicture);
     }
 
-    @                                                                                                                                           PatchMapping(value="/update-video/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value="/update-video/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
     public ActionDTO updateVideo(@PathVariable Integer id, @RequestParam("employeeVideo") MultipartFile employeeVideo) throws IOException
     {
         return  employeeService.updateEmployeeVideo(id,employeeVideo);
@@ -42,14 +43,20 @@ public class EmployeeController {
         return  employeeService.updateEmployeeDocument(id,employeeVideo);
     }
 
-    @PatchMapping(value="/update-status/{id}")
+    @GetMapping(value="/{id}")
+    public EmployeeDTO getEmployee(@PathVariable Integer id)
+    {
+        return  employeeService.getEmployeeData(id);
+    }
+
+    @GetMapping(value="/update-status/{id}")
     public ActionDTO updateStatus(@PathVariable Integer id)
     {
         return  employeeService.updateEmployeeStatus(id);
     }
 
     @GetMapping("/view-profile/{employeeId}")
-    public Employee viewProfile(@PathVariable Integer employeeId)
+    public EmployeeDTO viewProfile(@PathVariable Integer employeeId)
     {
         return  employeeService.getEmployeeData(employeeId);
     }
