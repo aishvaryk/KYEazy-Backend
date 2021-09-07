@@ -1,12 +1,10 @@
 package com.hashedin.product.kyeazy.controllers;
-
 import com.hashedin.product.kyeazy.dto.ActionDTO;
 import com.hashedin.product.kyeazy.dto.CompanyDTO;
 import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.exceptions.DataAlreadyExistsException;
-import com.hashedin.product.kyeazy.exceptions.RequiredFieldException;
 import com.hashedin.product.kyeazy.exceptions.response.ExceptionResponse;
 import com.hashedin.product.kyeazy.services.CompanyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 @CrossOrigin
 @RestController
@@ -32,30 +29,37 @@ public class CompanyController {
         this.companyService = companyService;
     }
 
+    // company
+
     @PostMapping(value = "/register")
     public CompanyDTO register(@RequestBody Company company) {
         return companyService.register(company);
     }
 
-    @PostMapping(value = "/register-employees/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ActionDTO registerEmployees(@PathVariable Integer id, @RequestParam("employeeCSV") MultipartFile employeeVideo) throws IOException {
-        return companyService.registerEmployees(id, employeeVideo);
-    }
-
     @PostMapping(value = "/register-employee/{companyId}")
-    public ActionDTO registerEmployee(@RequestBody Employee employee, @PathVariable Integer companyId) {
+    public ActionDTO registerEmployee(@RequestBody Employee employee, @PathVariable Integer companyId) throws Exception {
         return this.companyService.registerEmployee(employee, companyId);
     }
 
-    @GetMapping("/employees/{companyId}")
-    public List<EmployeeDTO> getEmployees(@PathVariable Integer companyId, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
-        return companyService.getEmployees(companyId, pageNumber, pageSize);
+    @PostMapping(value = "/register-employees/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ActionDTO registerEmployees(@PathVariable Integer id, @RequestParam("employeeCSV") MultipartFile employeeVideo) throws Exception {
+        return companyService.registerEmployees(id, employeeVideo);
     }
 
-    //error
-    @GetMapping("/employees-by-status/{companyId}/{status}")
-    public List<EmployeeDTO> getEmployeesByStatus(@PathVariable Integer companyId, @PathVariable String status, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
-        return companyService.getEmployeesByStatus(companyId, status, pageNumber, pageSize);
+    @PostMapping("/report-employee/{id}")
+    public ActionDTO reportEmployee(@PathVariable Integer id, @RequestBody String message) {
+        return companyService.reportEmployee(id,message);
+    }
+
+    @GetMapping("/re-kyc/{id}")
+    public EmployeeDTO reKycEmployee(@PathVariable Integer id) {
+        return companyService.reKycEmployee(id);
+    }
+
+    @PatchMapping(value="/add-icon/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ActionDTO updateCompanyIcon(@PathVariable Integer id, @RequestParam("companyIcon") MultipartFile companyIcon) throws IOException
+    {
+        return  companyService.updateCompanyIcon(id,companyIcon);
     }
 
     @GetMapping("/get-company-details/{id}")
@@ -63,23 +67,23 @@ public class CompanyController {
         return companyService.getCompanyDetails(id);
     }
 
-    @GetMapping("/get-employees-sorted-by-name/{id}")
-    public List<EmployeeDTO> getEmployeesSortedByName(@PathVariable Integer id, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
-        return companyService.getEmployeesSortedByName(id, pageNumber, pageSize);
-    }
+    // employees
 
-    @GetMapping("/get-employees-sorted-by-date/{id}")
-    public List<EmployeeDTO> getEmployeesSortedByDate(@PathVariable Integer id, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
-        return companyService.getEmployeesSortedByDate(id, pageNumber, pageSize);
+    @GetMapping("/employees/{companyId}")
+    public List<EmployeeDTO> getEmployees(@PathVariable Integer companyId, @RequestParam Integer pageNumber, @RequestParam Integer pageSize, @RequestParam String sort, @RequestParam String filter) {
+        return companyService.getEmployees(companyId, pageNumber, pageSize,sort,filter);
     }
 
     @GetMapping("/get-employees-by-name/{id}/{name}")
-    public List<EmployeeDTO> getEmployeeByName(@PathVariable Integer id, @PathVariable String name, @RequestParam Integer pageNumber, @RequestParam Integer pageSize) {
-        return companyService.getEmployeeByName(id, name, pageNumber, pageSize);
+    public List<EmployeeDTO> getEmployeesByName(@PathVariable Integer id, @PathVariable String name, @RequestParam Integer pageNumber, @RequestParam Integer pageSize, @RequestParam String sort, @RequestParam String filter) {
+        return companyService.getEmployeesByName(id, name, pageNumber, pageSize, sort, filter);
     }
-    @PostMapping("/report-employee/{id}")
-    public ActionDTO reportEmployee(@PathVariable Integer id, @RequestBody String message) {
-        return companyService.reportEmployee(id,message);
+
+    // count
+
+    @GetMapping("/get-searched-employees-size/{companyId}/{name}/{status}")
+    public long getSearchedEmployeesSize(@PathVariable String name, @PathVariable int companyId, @PathVariable String status ) {
+        return companyService.getSearchedEmployeesSize(companyId, name, status);
     }
     @PatchMapping(value="/icon/{id}",consumes= MediaType.MULTIPART_FORM_DATA_VALUE)
     public ActionDTO updateImage(@PathVariable Integer id, @RequestParam("icon") MultipartFile icon) throws IOException
@@ -88,6 +92,15 @@ public class CompanyController {
     }
 
 
+
+    @GetMapping("/get-employees-size/{companyId}/{filter}")
+    public long getEmployeesSize(@PathVariable int companyId,@PathVariable String filter ) {
+        return companyService.getEmployeesSize(companyId, filter);
+    }
+
+
+    // exceptions
+
     @ExceptionHandler
     public ResponseEntity<ExceptionResponse> handleException(DataAlreadyExistsException exc) {
         ExceptionResponse error = new ExceptionResponse();
@@ -95,7 +108,6 @@ public class CompanyController {
         error.setMessage(exc.getMessage());
         error.setTimeStamp(System.currentTimeMillis());
         return new ResponseEntity<>(error, HttpStatus.LENGTH_REQUIRED);
-
     }
 
     @ExceptionHandler
@@ -105,6 +117,5 @@ public class CompanyController {
         error.setMessage(exc.getMessage());
         error.setTimeStamp(System.currentTimeMillis());
         return new ResponseEntity<>(error, HttpStatus.LENGTH_REQUIRED);
-
     }
 }

@@ -1,6 +1,6 @@
 package com.hashedin.product.kyeazy.jwt.config;
 
-import com.hashedin.product.kyeazy.jwt.config.util.JwtUtil;
+import com.hashedin.product.kyeazy.utils.JwtUtil;
 import com.hashedin.product.kyeazy.services.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

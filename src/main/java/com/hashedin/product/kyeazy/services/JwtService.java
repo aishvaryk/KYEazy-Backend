@@ -4,7 +4,7 @@ import com.hashedin.product.kyeazy.dto.JwtRequest;
 import com.hashedin.product.kyeazy.dto.JwtResponse;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
-import com.hashedin.product.kyeazy.jwt.config.util.JwtUtil;
+import com.hashedin.product.kyeazy.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
