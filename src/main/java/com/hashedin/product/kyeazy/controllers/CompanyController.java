@@ -52,7 +52,7 @@ public class CompanyController {
     }
 
     @GetMapping("/re-kyc/{id}")
-    public ActionDTO reKycEmployee(@PathVariable Integer id) {
+    public EmployeeDTO reKycEmployee(@PathVariable Integer id) {
         return companyService.reKycEmployee(id);
     }
 

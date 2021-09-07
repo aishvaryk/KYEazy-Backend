@@ -77,6 +77,7 @@ public class Parser {
         employeeDTO.setGender(employee.getGender());
         employeeDTO.setCapturedImage(employee.getCapturedImage());
         employeeDTO.setQuestion(employee.getQuestion());
+        employeeDTO.setReview(employee.getReview());
         return employeeDTO;
     }
 

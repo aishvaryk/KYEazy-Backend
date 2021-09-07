@@ -65,6 +65,7 @@ public class AdminController {
     public EmployeeDTO accept(@PathVariable Integer id) {
         return adminService.accept(id);
     }
+
     @PatchMapping("/reject/{id}")
     public EmployeeDTO reject(@PathVariable Integer id,@RequestBody String message) {
         System.out.println("reject"+id);

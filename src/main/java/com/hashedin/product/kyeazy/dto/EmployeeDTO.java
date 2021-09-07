@@ -29,6 +29,7 @@ public class EmployeeDTO {
     private byte[] capturedImage;
     private String gender;
     private String question;
+    private String review;
 
 
 }

@@ -125,11 +125,23 @@ public class CompanyService {
             employee.setStatus("Registered");
             employee.setDateTimeOfApplication(new Date());
             List<Employee> allEmployees = employeeRepository.findAll();
+
+
+
+
             for (Employee employeeToCheck : allEmployees) {
 //            if (employeeToCheck.getEmailID().equals(employee.getEmailID()) && employeeToCheck.getCompanyId() == companyId)
 //                throw new DataAlreadyExistsException("The given is already registered with same company !!!!!");
                 if (employeeToCheck.getEmailID().equals(employee.getEmailID()))
                 {
+                    if(employeeToCheck.getStatus().equals("Registered"))
+                    {
+                        employeeToCheck.setEmployeeId(employeeToCheck.getEmployeeId());
+                        employeeToCheck.setCompanyId(id);
+                        employeeRepository.save(employeeToCheck);
+                        return new ActionDTO(employee.getEmployeeId(),false,"Already Exists") ;
+                    }
+
                     employee.setEmployeeId(employeeToCheck.getEmployeeId());
                     if(!employeeToCheck.getStatus().equals("Reported"))
                     {
@@ -162,15 +174,15 @@ public class CompanyService {
         return new ActionDTO(1,true,"Reporting Done");
          }
 
-    public ActionDTO reKycEmployee(Integer employeeId) {
+    public EmployeeDTO reKycEmployee(Integer employeeId) {
         Employee employee=employeeRepository.findById(employeeId).get();
         employee.setStatus("Registered");
         employee.setLock(false);
         Company company =companyRepository.findById(employee.getCompanyId()).get();
         company.setCoins(company.getCoins()-50);
         companyRepository.save(company);
-        employeeRepository.save(employee);
-        return new ActionDTO(1,true,"Re Kyc Done");
+        Employee savedEmployee=employeeRepository.save(employee);
+        return Parser.parseEmployee(savedEmployee);
     }
 
     @Transactional
