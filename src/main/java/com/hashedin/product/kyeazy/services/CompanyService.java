@@ -60,27 +60,31 @@ public class CompanyService {
     }
 
     @Transactional
-    public ActionDTO registerEmployee(Employee employee, int companyId) throws DataAlreadyExistsException {
+    public ActionDTO registerEmployee(Employee employee, int companyId) throws Exception {
+
+      if(companyRepository.findById(companyId).get().getCoins()<50) throw new Exception("Not Enough Coins");
         List<Employee> employees = employeeRepository.findAll();
         for (Employee employeeToCheck : employees) {
-            if (employeeToCheck.getEmailID().equals(employee.getEmailID()) && employeeToCheck.getCompanyId() == companyId)
-                throw new DataAlreadyExistsException("The given is already registered with same company !!!!!");
-            if (employeeToCheck.getEmailID().equals(employee.getEmailID()))
+//            if (employeeToCheck.getEmailID().equals(employee.getEmailID()) && employeeToCheck.getCompanyId() == companyId)
+//                throw new DataAlreadyExistsException("The given is already registered with same company !!!!!");
+         if (employeeToCheck.getEmailID().equals(employee.getEmailID()))
             {
-                // -------------------------
-                // exist
-                // What is Status ?
-                // if Status is Reported
-                // setStatus("Reported")
-                // else
-                // setSatus("Re-Registerd")
-                // setPrevious Status
-                // ---------------------------
-                // rekyc
-                // setLock(false);
-                // status -> registerd
-                // remove Old Data
-                return null ;
+                if(employeeToCheck.getStatus().equals("Registered"))
+                {
+                    employeeToCheck.setEmployeeId(employeeToCheck.getEmployeeId());
+                    employeeToCheck.setCompanyId(companyId);
+                    employeeRepository.save(employeeToCheck);
+                    return new ActionDTO(employee.getEmployeeId(),false,"Already Exists") ;
+                }
+                employee.setEmployeeId(employeeToCheck.getEmployeeId());
+                if(!employeeToCheck.getStatus().equals("Reported") )
+                {
+                    employeeToCheck.setStatus("Existed");
+                    employeeToCheck.setPreviousStatus(employeeToCheck.getStatus());
+                    employeeToCheck.setCompanyId(companyId);
+                }
+                employeeRepository.save(employeeToCheck);
+                return new ActionDTO(employee.getEmployeeId(),false,"Already Exists") ;
             }
         }
         String username = this.generateUsername(employee);
@@ -99,7 +103,9 @@ public class CompanyService {
     }
 
     @Transactional
-    public ActionDTO registerEmployees(Integer id, MultipartFile employeesList) throws IOException {
+    public ActionDTO registerEmployees(Integer id, MultipartFile employeesList) throws Exception {
+
+
         String DELIMITER = ",";
         InputStreamReader isr = new InputStreamReader(employeesList.getInputStream(),
                 StandardCharsets.UTF_8);
@@ -107,6 +113,7 @@ public class CompanyService {
         String line;
         Employee employee;
         br.readLine();
+        List<Employee> employees=new LinkedList<>();
         while ((line = br.readLine()) != null) {
             employee = new Employee();
             String[] columns = line.split(DELIMITER);
@@ -116,20 +123,54 @@ public class CompanyService {
             employee.setContactNumber(columns[3]);
             employee.setCompanyId(id);
             employee.setStatus("Registered");
-            employeeRepository.save(employee);
+            employee.setDateTimeOfApplication(new Date());
+            List<Employee> allEmployees = employeeRepository.findAll();
+            for (Employee employeeToCheck : allEmployees) {
+//            if (employeeToCheck.getEmailID().equals(employee.getEmailID()) && employeeToCheck.getCompanyId() == companyId)
+//                throw new DataAlreadyExistsException("The given is already registered with same company !!!!!");
+                if (employeeToCheck.getEmailID().equals(employee.getEmailID()))
+                {
+                    employee.setEmployeeId(employeeToCheck.getEmployeeId());
+                    if(!employeeToCheck.getStatus().equals("Reported"))
+                    {
+                        employeeToCheck.setStatus("Existed");
+                        employeeToCheck.setPreviousStatus(employeeToCheck.getStatus());
+                        employeeToCheck.setCompanyId(id);
+                        break;
+                    }
+
+                  //  employeeRepository.save(employeeToCheck);
+                    //return new ActionDTO(employee.getEmployeeId(),false,"Already Exists") ;
+                }
+            }
+            employees.add(employee);
         }
+
+        if(companyRepository.findById(id).get().getCoins()<employees.size()*50) throw new Exception("Not Enough Coins");
+
+        employeeRepository.saveAll(employees);
         return new ActionDTO(1, true, "Employees Added Successfully !");
     }
 
     // error
     @Transactional
-    public List<EmployeeDTO> reportEmployee(Integer employeeId, String message){
+    public ActionDTO reportEmployee(Integer employeeId, String message){
         Employee employee=employeeRepository.findById(employeeId).get();
         employee.setStatus("Reported");
         employee.setReview(message);
         employeeRepository.save(employee);
-        //return getEmployees(employee.getCompanyId(), 1, 5);
-        return null;
+        return new ActionDTO(1,true,"Reporting Done");
+         }
+
+    public ActionDTO reKycEmployee(Integer employeeId) {
+        Employee employee=employeeRepository.findById(employeeId).get();
+        employee.setStatus("Registered");
+        employee.setLock(false);
+        Company company =companyRepository.findById(employee.getCompanyId()).get();
+        company.setCoins(company.getCoins()-50);
+        companyRepository.save(company);
+        employeeRepository.save(employee);
+        return new ActionDTO(1,true,"Re Kyc Done");
     }
 
     @Transactional

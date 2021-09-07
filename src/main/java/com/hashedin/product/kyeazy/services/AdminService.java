@@ -118,12 +118,28 @@ public class AdminService {
     // employee
 
     @Transactional
-    public EmployeeDTO verify(String status, Integer id) {
+    public EmployeeDTO accept(Integer id) {
         Employee employee = getEmployeeById(id);
-        employee.setStatus(status);
+        employee.setStatus("Accepted");
         employee.setDateTimeOfVerification(new Date());
+        employee.setAddress(employee.getAddress());
+        employee.setReview("");
+        //employee.setLock(true);
         Company company =companyRepository.findById(employee.getCompanyId()).get();
-        company.setCoins(company.getCoins()-company.getPlan());
+        company.setCoins(company.getCoins()-50);
+        companyRepository.save(company);
+        Employee savedEmployee = employeeRepository.save(employee);
+        return Parser.parseEmployee(savedEmployee);
+    }
+    @Transactional
+    public EmployeeDTO reject(Integer id,String message) {
+        Employee employee = getEmployeeById(id);
+        employee.setStatus("Rejected");
+        employee.setDateTimeOfVerification(new Date());
+        //employee.setLock(true);
+        employee.setReview(message);
+        Company company =companyRepository.findById(employee.getCompanyId()).get();
+        company.setCoins(company.getCoins()-50);
         companyRepository.save(company);
         Employee savedEmployee = employeeRepository.save(employee);
         return Parser.parseEmployee(savedEmployee);

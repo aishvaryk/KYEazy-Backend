@@ -55,6 +55,12 @@ public class Employee {
     @Column(name="gender")
     private String gender;
 
+    @Column(name="lock")
+    private boolean lock=false;
+
+    @Column(name="previous_status")
+    private String previousStatus;
+
     @Lob
     @Column(name="captured_image")
     private byte[] capturedImage;
