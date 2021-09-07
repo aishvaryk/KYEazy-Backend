@@ -37,21 +37,21 @@ public class AdminServiceTest {
     @Mock
     CompanyRepository companyRepository;
 
-    @Test
-    public void shouldVerify() {
-        Employee employee=new Employee();
-        employee.setDisplayName("Kartikey");
-        employee.setEmployeeId(1);
-        employee.setGender("Male");
-        employee.setUsername("Kar123");
-        employee.setPassword("Kar123#");
-        employee.setStatus("Registered");
-
-        when(employeeRepository.save(isA(Employee.class))).thenReturn(employee);
-        when(employeeRepository.findById(isA(Integer.class))).thenReturn(java.util.Optional.of(employee));
-        EmployeeDTO employeeDTO= adminService.verify("Accepted",1);
-        assertEquals(employeeDTO.getStatus(),"Accepted");
-    }
+//    @Test
+//    public void shouldVerify() {
+//        Employee employee=new Employee();
+//        employee.setDisplayName("Kartikey");
+//        employee.setEmployeeId(1);
+//        employee.setGender("Male");
+//        employee.setUsername("Kar123");
+//        employee.setPassword("Kar123#");
+//        employee.setStatus("Registered");
+//
+//        when(employeeRepository.save(isA(Employee.class))).thenReturn(employee);
+//        when(employeeRepository.findById(isA(Integer.class))).thenReturn(java.util.Optional.of(employee));
+//        EmployeeDTO employeeDTO= adminService.verify("Accepted",1);
+//        assertEquals(employeeDTO.getStatus(),"Accepted");
+//    }
 
     @Test
     public  void shouldGetCompaniesByName() {

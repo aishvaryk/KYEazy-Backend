@@ -1,5 +1,6 @@
 package com.hashedin.product.kyeazy.TestServices;
 import com.hashedin.product.kyeazy.dto.ActionDTO;
+import com.hashedin.product.kyeazy.dto.EmployeeDTO;
 import com.hashedin.product.kyeazy.entities.Company;
 import com.hashedin.product.kyeazy.entities.Employee;
 import com.hashedin.product.kyeazy.repositories.CompanyRepository;
@@ -66,7 +67,7 @@ public class EmployeeServiceTest {
         employee.setStatus("Registered");
 
         when(employeeRepository.findById(isA(Integer.class))).thenReturn(java.util.Optional.of(employee));
-        Employee employeeResult = employeeService.getEmployeeData(1);
+        EmployeeDTO employeeResult = employeeService.getEmployeeData(1);
         assertNotNull(employeeResult);
         assertEquals(employeeResult.getEmployeeId(),1);
 
