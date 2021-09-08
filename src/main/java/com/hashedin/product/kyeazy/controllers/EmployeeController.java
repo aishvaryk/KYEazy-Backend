@@ -22,6 +22,11 @@ public class EmployeeController {
     @PatchMapping("/update-profile")
     public ActionDTO updateProfile(@RequestBody Employee employee)
     {
+        System.out.println("In Controller");
+        System.out.println(employee.getDocumentNumber());
+        System.out.println(employee.getGender());
+        System.out.println(employee.getQuestion());
+        System.out.println(employee.getDocumentType());
         return  employeeService.updateProfileData(employee);
     }
 
