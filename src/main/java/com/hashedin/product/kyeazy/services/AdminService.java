@@ -20,6 +20,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class AdminService {
@@ -81,6 +82,22 @@ public class AdminService {
             employeeDTOS.add(Parser.parseEmployee(employee));
         }
         return employeeDTOS;
+    }
+    @Transactional
+    public List<CompanyDTO> getTopPerformer(){
+        List<Company> companies=companyRepository.findAll();
+        List<CompanyDTO> topPerformer= new LinkedList<>();
+        List<CompanyDTO> companyDTOS= new LinkedList<>();
+        for(Company company:companies){
+            companyDTOS.add(Parser.parseCompany(company));
+        }
+        List<CompanyDTO> result  = companyDTOS.stream().sorted(Comparator.comparing(CompanyDTO::getNumberOfTotalEmployees)).collect(Collectors.toList());
+        int c=0;
+        for(int i=result.size()-1;i>=0 && c<3;i--){
+            topPerformer.add(result.get(i));
+            c++;
+        }
+        return topPerformer;
     }
 
     @Transactional

@@ -147,4 +147,9 @@ public class AdminController {
         return new ResponseEntity<>(error, HttpStatus.LENGTH_REQUIRED);
     }
 
+    @GetMapping("/get-top-performer")
+    public List<CompanyDTO> getTopPerformer() {
+        return adminService.getTopPerformer();
+    }
+
 }
