@@ -31,7 +31,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             return new User(employee.getUsername(), employee.getPassword(), new ArrayList<>());
         }
         if(userName.charAt(0)=='A') {
-            return new User("Riya", "Riya123", new ArrayList<>());
+            return new User("admin", "admin", new ArrayList<>());
         }
     return  null;
 

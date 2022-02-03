@@ -34,8 +34,8 @@ public class JwtService {
         String username="";
         if(jwtRequest.getRole().equals("ADMIN"))
         {
-            if(!jwtRequest.getUsername().equals("Riya")) throw new Exception("Wrong Username!");
-            if(! jwtRequest.getPassword().equals("Riya123")) throw new Exception("Invalid Credentials!");
+            if(!jwtRequest.getUsername().equals("admin")) throw new Exception("Wrong Username!");
+            if(! jwtRequest.getPassword().equals("admin")) throw new Exception("Invalid Credentials!");
             username+="A"+jwtRequest.getUsername();
         }
         if(jwtRequest.getRole().equals("COMPANY"))
