@@ -89,7 +89,7 @@ public class CompanyService {
         }
         String username = this.generateUsername(employee);
         String passkey = String.valueOf(this.generatePassword(employee));
-        String link = "https://kycfront-amxbp6pvia-as.a.run.app/";
+        String link = "https://kyeazy-945b9.web.app/";
         String mailBody = "Hey " + employee.getFirstName() + "," + "Your Id password for doing kyc is  Username: " + username + " Password:" + passkey + " Link:" + link;
         this.emailSender.sendMail(employee.getEmailID(), "Regarding KYC", mailBody);
         employee.setUsername(username);
